@@ -6,7 +6,7 @@ const STORAGE_KEY = "userChecklistProgress";
 const defaultProgress = {
   keys: 4,
   completedModules: [],
-  unlockedModules: ['school', 'pre-arrival-1', 'pre-arrival-2'],
+  unlockedModules: ['school', 'pre-arrival-1', 'pre-arrival-2', 'post-arrival', 'integration', 'finance'],
   currentPage: 'checklist'
 };
 
