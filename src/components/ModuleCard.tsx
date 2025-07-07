@@ -29,8 +29,7 @@ export const ModuleCard = ({
   onModuleClick,
   userKeys 
 }: ModuleCardProps) => {
-  const canUnlock = module.keysRequired ? userKeys >= module.keysRequired : true;
-  const canClick = isUnlocked || (module.keysRequired && canUnlock);
+  const canClick = true; // All modules are now clickable
 
   // Toned down banner background
   const bannerBgClass = "bg-gradient-to-br from-blue-50 to-cyan-50";
@@ -47,22 +46,6 @@ export const ModuleCard = ({
       <CardContent className="p-6">
         <div className={`w-full h-32 ${bannerBgClass} rounded-lg mb-4 flex items-center justify-center relative overflow-hidden`}>
           <div className="text-4xl text-blue-500">{module.icon}</div>
-
-          {!isUnlocked && module.keysRequired && (
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex flex-col items-center justify-center">
-              <Lock className="h-6 w-6 text-white mb-2" />
-              <div className="flex items-center text-white text-sm">
-                <Key className="h-4 w-4 mr-1" />
-                <span>{module.keysRequired}</span>
-              </div>
-            </div>
-          )}
-
-          {!isUnlocked && !module.keysRequired && (
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-              <Lock className="h-8 w-8 text-white" />
-            </div>
-          )}
 
           {isCompleted && (
             <div className="absolute top-2 right-2">
@@ -88,23 +71,11 @@ export const ModuleCard = ({
           <span className={`text-xs px-2 py-1 rounded-full ${
             isCompleted
               ? 'bg-green-100 text-green-800'
-              : isUnlocked
-                ? 'bg-blue-100 text-blue-800'
-                : module.keysRequired
-                  ? canUnlock
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-red-100 text-red-800'
-                  : 'bg-gray-100 text-gray-800'
+              : 'bg-blue-100 text-blue-800'
           }`}>
             {isCompleted 
               ? 'Completed' 
-              : isUnlocked 
-                ? 'Available' 
-                : module.keysRequired
-                  ? canUnlock
-                    ? `Unlock (${module.keysRequired} 🗝️)`
-                    : `Need ${module.keysRequired} 🗝️`
-                  : 'Locked'
+              : 'Available'
             }
           </span>
 

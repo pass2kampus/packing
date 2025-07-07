@@ -122,46 +122,13 @@ export const ChecklistModule = ({
   const handleModuleClick = (module: Module) => {
     console.log('Module clicked:', module.id);
     const isUnlocked = userProgress.unlockedModules.includes(module.id);
-
-    // If module is locked and requires keys, check if user has enough keys
-    if (!isUnlocked && module.keysRequired) {
-      if (userProgress.keys < module.keysRequired) {
-        toast({
-          title: "Not Enough Keys",
-          description: `You need ${module.keysRequired} key${module.keysRequired > 1 ? 's' : ''} to unlock this module.`,
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setUserProgress(prevProgress => {
-        const alreadyUnlocked = prevProgress.unlockedModules.includes(module.id);
-        if (alreadyUnlocked) return prevProgress;
-
-        return {
-          ...prevProgress,
-          keys: prevProgress.keys - module.keysRequired,
-          unlockedModules: [...prevProgress.unlockedModules, module.id]
-        };
-      });
-
-      toast({
-        title: "New Module Unlocked",
-        description: `You've unlocked "${module.title}" by spending ${module.keysRequired} key${module.keysRequired > 1 ? 's' : ''}!`,
-        variant: "default",
-      });
-
-      // After unlocking, navigate to the page
-      if (pageMapping[module.id]) {
-        console.log('Navigating to unlocked page:', pageMapping[module.id]);
-        setCurrentPage(pageMapping[module.id]);
-      }
-      return;
-    }
-
-    if (!isUnlocked && !module.keysRequired) {
-      console.log('Module is locked and has no key requirement');
-      return;
+    
+    // Add module to unlocked modules if not already there
+    if (!isUnlocked) {
+      setUserProgress(prevProgress => ({
+        ...prevProgress,
+        unlockedModules: [...prevProgress.unlockedModules, module.id]
+      }));
     }
 
     // Navigate to the mapped page directly using setCurrentPage

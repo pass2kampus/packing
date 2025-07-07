@@ -30,8 +30,7 @@ const checklistModules = [
     description: 'Essential tasks to complete after arriving in France.',
     icon: '✅',
     color: 'bg-orange-500',
-    type: 'module',
-    keysRequired: 2
+    type: 'module'
   },
   {
     id: 'packing-assistance',
@@ -47,8 +46,7 @@ const checklistModules = [
     description: 'Learn French culture, language basics, and integration tips.',
     icon: '🇫🇷',
     color: 'bg-red-500',
-    type: 'navigation',
-    keysRequired: 1
+    type: 'navigation'
   },
   {
     id: 'finance',
@@ -56,8 +54,7 @@ const checklistModules = [
     description: 'Manage your expenses and budget while studying in France.',
     icon: '💰',
     color: 'bg-yellow-500',
-    type: 'module',
-    keysRequired: 3
+    type: 'module'
   }
 ];
 
