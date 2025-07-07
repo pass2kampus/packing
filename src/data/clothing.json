@@ -1,0 +1,133 @@
+{
+  "category": "Clothing",
+  "items": [
+    {
+      "name": "Thermal Innerwear",
+      "why": "Essential for winter months (Oct–Feb); helps reduce layering bulk.",
+      "packFromIndia": true,
+      "buyInRouen": false,
+      "stores": []
+    },
+    {
+      "name": "Winter Jacket",
+      "why": "Highly recommended. Choose between bringing a good-quality one or buying in France.",
+      "packFromIndia": false,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "Primark", "price": "€25–€40" },
+        { "name": "Decathlon", "price": "€40–€70" },
+        { "name": "H&M", "price": "€30–€60" }
+      ]
+    },
+    {
+      "name": "Raincoat or Waterproof Jacket",
+      "why": "Rouen experiences frequent rainfall, especially in fall/winter.",
+      "packFromIndia": true,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "Decathlon", "price": "€20–€40" }
+      ]
+    },
+    {
+      "name": "Sweatshirts / Hoodies",
+      "why": "Daily wear during autumn/spring. Light layers are useful indoors too.",
+      "packFromIndia": true,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "Primark", "price": "€10–€20" },
+        { "name": "H&M", "price": "€15–€25" }
+      ]
+    },
+    {
+      "name": "Jeans / Trousers",
+      "why": "Students often face size/fit issues in France, especially in length.",
+      "packFromIndia": true,
+      "buyInRouen": false,
+      "stores": []
+    },
+    {
+      "name": "T-Shirts / Shirts",
+      "why": "Easy to layer. Readily available in France, but cheaper in India.",
+      "packFromIndia": true,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "Primark", "price": "€4–€10" },
+        { "name": "H&M", "price": "€6–€15" }
+      ]
+    },
+    {
+      "name": "Underwear & Socks",
+      "why": "Bring enough for 1–2 weeks. Cotton is preferred; Indian brands are more affordable.",
+      "packFromIndia": true,
+      "buyInRouen": false,
+      "stores": []
+    },
+    {
+      "name": "Sleepwear / Loungewear",
+      "why": "Comfortable clothing for dorms. Bring at least one set.",
+      "packFromIndia": true,
+      "buyInRouen": false,
+      "stores": []
+    },
+    {
+      "name": "Ethnic Wear (Kurta/Saree etc.)",
+      "why": "Optional. Useful for cultural events, Diwali, Onam, etc.",
+      "packFromIndia": true,
+      "buyInRouen": false,
+      "stores": []
+    },
+    {
+      "name": "Shoes (Sneakers / Casual)",
+      "why": "Good-quality shoes are expensive in France. Bring a pair you trust.",
+      "packFromIndia": true,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "Decathlon", "price": "€25–€60" },
+        { "name": "Nike/Adidas Outlet", "price": "€50–€100" }
+      ]
+    },
+    {
+      "name": "Flip-Flops / Slippers",
+      "why": "Useful for indoors and shared bathrooms (especially in CROUS).",
+      "packFromIndia": true,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "Action", "price": "€2–€5" }
+      ]
+    },
+    {
+      "name": "Thermal Gloves & Cap",
+      "why": "Must-have for winter. Lightweight items that take up little space.",
+      "packFromIndia": true,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "Decathlon", "price": "€5–€15" }
+      ]
+    },
+    {
+      "name": "Formal Shirt / Blazer (1 Set)",
+      "why": "For presentations, interviews, or career fairs. Optional but recommended.",
+      "packFromIndia": true,
+      "buyInRouen": false,
+      "stores": []
+    },
+    {
+      "name": "Scarf / Muffler",
+      "why": "Essential in colder months to avoid flu. Compact and useful.",
+      "packFromIndia": true,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "H&M", "price": "€8–€15" }
+      ]
+    },
+    {
+      "name": "Rain Shoes / Waterproof Footwear",
+      "why": "If you walk to class in rain often, this is a lifesaver.",
+      "packFromIndia": false,
+      "buyInRouen": true,
+      "stores": [
+        { "name": "Decathlon", "price": "€15–€35" }
+      ]
+    }
+  ]
+}
