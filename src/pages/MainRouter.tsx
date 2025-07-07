@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { HomePage } from '@/components/HomePage';
@@ -16,6 +15,7 @@ import { PreArrival1Page } from './PreArrival1Page';
 import { PreArrival2Page } from './PreArrival2Page';
 import { PostArrivalPage } from './PostArrivalPage';
 import { FinanceTrackingPage } from './FinanceTrackingPage';
+import { PackingAssistancePage } from './PackingAssistancePage';
 import { NotificationsPage } from './NotificationsPage';
 import { QAPage } from './QAPage';
 import { SuggestionsPage } from './SuggestionsPage';
@@ -116,6 +116,8 @@ const MainRouter = ({
       case 'finance':
       case 'finance-tracking':
         return <FinanceTrackingPage onBack={() => setCurrentPage('checklist')} />;
+      case 'packing-assistance':
+        return <PackingAssistancePage onBack={() => setCurrentPage('checklist')} />;
       case 'notifications':
         return <NotificationsPage />;
       case 'qa':
