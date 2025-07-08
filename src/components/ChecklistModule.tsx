@@ -92,7 +92,6 @@ export const ChecklistModule = ({
     'school': 'school-insights',
     'pre-arrival-1': 'pre-arrival-1',
     'pre-arrival-2': 'pre-arrival-2',
-    'packing-assistance': 'packing-assistance',
     'post-arrival': 'post-arrival',
     'integration': 'language',
     'finance': 'finance-tracking',
