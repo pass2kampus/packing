@@ -431,9 +431,12 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                         </Badge>
                       )}
                     </div>
-                    {item.note && ( 
-                      <p className="text-sm text-gray-600 mb-1">{item.note}</p>
+                    {(item.note || item.tooltip) && ( 
+                      <p className="text-sm text-gray-600 mb-1">
+                        {item.note || item.tooltip}
+                      </p>
                     )}
+
                     {(item.storeInfo || item.priceRange) && (
                       <div className="flex items-center text-xs text-gray-500 mb-1">
                         <ShoppingBag className="h-3 w-3 mr-1" />
@@ -450,11 +453,6 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                     {item.studentTip && ( 
                       <div className="bg-blue-50 p-2 rounded-md text-xs text-blue-700 mt-1">
                         <span className="font-medium">Student Tip:</span> {item.studentTip}
-                      </div>
-                    )}
-                    {item.tooltip && (
-                      <div className="text-xs text-gray-600 mt-1 italic">
-                        {item.tooltip}
                       </div>
                     )}
                   </div>
