@@ -19,9 +19,9 @@ import clothingDataRaw from '@/data/clothing.json';
 import confetti from 'canvas-confetti';
 
 const clothingData = clothingDataRaw.items ? [
-  ...(clothingDataRaw.items.mustBring || []).map(item => ({ ...item, tag: 'Pack from India' })),
-  ...(clothingDataRaw.items.optional || []).map(item => ({ ...item, tag: 'Optional' })),
-  ...(clothingDataRaw.items.buyInFrance || []).map(item => ({ ...item, tag: 'Buy in France' }))
+  ...(clothingDataRaw.items.mustBring || []),
+  ...(clothingDataRaw.items.optional || []),
+  ...(clothingDataRaw.items.buyInFrance || [])
 ] : [];
 
 interface PackingItem {
@@ -56,9 +56,16 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const { toast: uiToast } = useToast();
 
   const generateInitialItems = (): PackingItem[] => {
-    return clothingData.map((item, index) => {
-      let source: PackingItem['source'] = item.tag as PackingItem['source'];
-      return {
+    const items: PackingItem[] = [];
+
+    clothingData.forEach((item, index) => {
+      let source: PackingItem['source'] = item.tag === 'Pack from India'
+        ? 'Pack from India'
+        : item.tag === 'Buy in France'
+          ? 'Buy in France'
+          : 'Optional';
+
+      items.push({
         id: `clothing-${index}`,
         name: item.name,
         category: 'clothing',
@@ -68,8 +75,10 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
         storeInfo: item.storeSuggestions?.join(', ') || '',
         studentTip: item.studentTip || '',
         priceRange: ''
-      };
+      });
     });
+
+    return items;
   };
 
   useEffect(() => {
@@ -107,8 +116,36 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   });
 
   return (
-    <div>
-      {/* Add your JSX UI rendering with filteredItems */}
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Packing Assistance – Clothing</h1>
+      <div className="mb-4">
+        <Progress value={progressPercentage} />
+        <p className="text-sm text-gray-600 mt-1">{checkedItems} of {totalItems} items packed</p>
+      </div>
+      <div className="mb-4">
+        <Checkbox id="hide-packed" checked={hidePacked} onCheckedChange={(checked) => setHidePacked(!!checked)} />
+        <label htmlFor="hide-packed" className="ml-2 text-sm">Hide packed items</label>
+      </div>
+      {filteredItems.length === 0 ? (
+        <p className="text-gray-500">No items to display.</p>
+      ) : (
+        filteredItems.map(item => (
+          <Card key={item.id} className="mb-3">
+            <CardContent className="p-4 flex items-start gap-4">
+              <Checkbox 
+                checked={item.isChecked} 
+                onCheckedChange={(checked) => handleItemCheck(item.id, !!checked)}
+              />
+              <div>
+                <h3 className="font-medium text-lg">{item.name}</h3>
+                <p className="text-sm text-gray-600">{item.note}</p>
+                {item.storeInfo && <p className="text-sm text-gray-500">Stores: {item.storeInfo}</p>}
+                {item.studentTip && <p className="text-sm text-blue-600 italic">Student Tip: {item.studentTip}</p>}
+              </div>
+            </CardContent>
+          </Card>
+        ))
+      )}
     </div>
   );
 };
