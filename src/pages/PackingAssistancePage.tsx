@@ -16,7 +16,11 @@ import { useToast } from '@/hooks/use-toast';
 import clothingDataRaw from '@/data/clothing.json';
 import confetti from 'canvas-confetti';
 
-const clothingData = clothingDataRaw.items || [];
+const clothingData = [
+  ...clothingDataRaw.items.mustBring.map(item => ({ ...item, source: 'Pack from India' as const })),
+  ...clothingDataRaw.items.optional.map(item => ({ ...item, source: 'Optional' as const })),
+  ...clothingDataRaw.items.buyInFrance.map(item => ({ ...item, source: 'Buy in France' as const }))
+];
 
 interface PackingItem {
   id: string;
@@ -51,23 +55,20 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
 
   const generateInitialItems = (): PackingItem[] => {
     return clothingData.map((item, index) => {
-      let source: PackingItem['source'] = 'Optional';
-      if (item.packFromIndia) source = 'Pack from India';
-      else if (item.buyInRouen) source = 'Buy in France';
-
-      const storeInfo = item.stores?.length > 0
-        ? item.stores.map((s: any) => `${s.name} (${s.price})`).join(', ')
+      const storeInfo = item.storeSuggestions?.length > 0
+        ? item.storeSuggestions.join(', ')
         : '';
 
       return {
         id: `clothing-${index}`,
         name: item.name,
         category: 'clothing',
-        source,
-        note: item.why,
+        source: item.source,
+        note: item.tooltip,
         isChecked: false,
         storeInfo,
-        priceRange: item.stores?.[0]?.price || ''
+        tooltip: item.tooltip,
+        studentTip: item.studentTip
       };
     });
   };
