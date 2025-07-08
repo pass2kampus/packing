@@ -189,9 +189,6 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       })
     );
 
-    // 🔜 The rest of the `generateInitialItems()` will continue in **Chunk 2**
-    return items;
-  };
     // FOOD & GROCERIES
     items.push(
       {
@@ -336,7 +333,6 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     // 🛏️ Accommodation
     // 🧼 Toiletries & Personal Care
 
-Let me know to continue.
     // ELECTRONICS
     items.push(
       {
@@ -657,6 +653,7 @@ Let me know to continue.
     );
 
     return items;
+  };
   };
   const initialPackingItems = generateInitialItems();
 
