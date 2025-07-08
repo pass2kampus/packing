@@ -110,6 +110,7 @@
       {
         "name": "Boots",
         "tag": "Buy in France",
+        "tooltip": "Not mandatory in Rouen, but available from €25–60.",
         "storeSuggestions": ["Decathlon (€30–60)", "H&M (€25–50)"],
         "studentTip": "Jay and Shravan used grippy sneakers instead."
       }
