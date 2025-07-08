@@ -17,7 +17,7 @@ import foodData from '@/data/food.json';
 import kitchenData from '@/data/kitchen.json';
 import electronicsData from '@/data/electronics.json';
 import accommodationData from '@/data/accommodation.json';
-
+import toiletriesData from '@/data/toiletries.json';
 import confetti from 'canvas-confetti';
 
 
@@ -257,17 +257,41 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       });
     }
 
+    // Process toiletries items from JSON
+    if (toiletriesData) {
+      toiletriesData.forEach((item, index) => {
+        let source: PackingItem['source'];
+        switch (item.recommendation) {
+          case 'must-bring':
+            source = 'Pack from India';
+            break;
+          case 'buy-there':
+            source = 'Buy in France';
+            break;
+          case 'optional':
+          default:
+            source = 'Optional';
+            break;
+        }
 
-    // Add hardcoded items for other categories
-    items.push(
+        const storeSuggestions = item.storeSuggestions?.map(
+          s => `${s.store}${s.approxPrice ? ` (${s.approxPrice})` : ''}`
+        );
+
+        items.push({
+          id: `toiletries-${index}`,
+          name: item.item,
+          category: 'toiletries',
+          source,
+          note: item.studentTips,
+          isChecked: false,
+          tooltip: item.studentTips,
+          storeSuggestions
+        });
+      });
+    }
+
     
-    
-      // Toiletries & Personal Care
-      { id: '27', name: 'Medications', category: 'toiletries', source: 'Pack from India', note: 'Bring prescription meds & basics for first month', isChecked: false },
-      { id: '28', name: 'Toiletries', category: 'toiletries', source: 'Buy in France', note: 'Shampoo, soap, etc. - save luggage weight', isChecked: false, storeInfo: 'Carrefour, Monoprix', priceRange: '€10-30' },
-      { id: '29', name: 'Eyeglasses/Contacts', category: 'toiletries', source: 'Pack from India', note: 'Bring extra pair & prescription', isChecked: false },
-      { id: '30', name: 'Skincare Products', category: 'toiletries', source: 'Optional', note: 'Bring favorites, but French pharmacies are excellent', isChecked: false }
-    );
     return items;
   };
 
