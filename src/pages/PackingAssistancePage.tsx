@@ -16,6 +16,8 @@ import clothingData from '@/data/clothing.json';
 import foodData from '@/data/food.json';
 import kitchenData from '@/data/kitchen.json';
 import electronicsData from '@/data/electronics.json';
+import accommodationData from '@/data/accommodation.json';
+
 import confetti from 'canvas-confetti';
 
 
@@ -231,14 +233,34 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       });
     }
 
+    // Process accommodation items from JSON
+    if (accommodationData && Array.isArray(accommodationData)) {
+      accommodationData.forEach((item, index) => {
+        const storeSuggestions = item.storeSuggestions?.map(s => `${s.store} (${s.approxPrice})`);
+        const source = item.recommendation === 'must-bring'
+          ? 'Pack from India'
+          : item.recommendation === 'buy-there'
+          ? 'Buy in France'
+          : 'Optional';
+
+        items.push({
+          id: `accommodation-${index}`,
+          name: item.item,
+          category: 'accommodation',
+          source,
+          note: '',
+          isChecked: false,
+          tooltip: item.studentTips,
+          storeSuggestions,
+          studentTip: item.studentTips
+        });
+      });
+    }
+
+
     // Add hardcoded items for other categories
     items.push(
     
-    
-      // Accommodation Setup
-      { id: '24', name: 'Bedsheets & Pillowcases', category: 'accommodation', source: 'Buy in France', note: 'French beds may have different sizes', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€20-40' },
-      { id: '25', name: 'Towels', category: 'accommodation', source: 'Buy in France', note: 'Save luggage space', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€10-30' },
-      { id: '26', name: 'Small Desk Lamp', category: 'accommodation', source: 'Buy in France', note: 'For study area', isChecked: false, storeInfo: 'IKEA, Action', priceRange: '€10-20' },
     
       // Toiletries & Personal Care
       { id: '27', name: 'Medications', category: 'toiletries', source: 'Pack from India', note: 'Bring prescription meds & basics for first month', isChecked: false },
