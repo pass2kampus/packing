@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,13 +9,12 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Info, Plus, Download, ShoppingBag, Shirt, Utensils, Plug, Home, Droplet } from 'lucide-react';
+import { ArrowLeft, Info, Plus, Download, Save, MapPin, Filter, ShoppingBag, Shirt, Utensils, Plug, Home, Droplet } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
 import clothingData from '@/data/clothing.json';
-import foodData from '@/data/food.json';
-import kitchenData from '@/data/kitchen.json';
 import confetti from 'canvas-confetti';
+
 
 interface PackingItem {
   id: string;
@@ -28,8 +27,6 @@ interface PackingItem {
   tooltip?: string;
   storeSuggestions?: string[];
   studentTip?: string;
-  storeInfo?: string;
-  priceRange?: string;
 }
 
 interface PackingAssistancePageProps {
@@ -42,108 +39,145 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const [packingItems, setPackingItems] = useState<PackingItem[]>([]);
   const [justCompleted, setJustCompleted] = useState(false);
   const [hidePacked, setHidePacked] = useState(false);
-  const [categoryInsights, setCategoryInsights] = useState<Record<string, string>>({});
-  const [autoToggleHidePacked, setAutoToggleHidePacked] = useState<Record<string, boolean>>({});
   const [newItem, setNewItem] = useState<Omit<PackingItem, 'id' | 'isChecked' | 'category'>>({
     name: '',
-    source: 'Pack from India'
+    source: 'Pack from India',
   });
   const { toast: uiToast } = useToast();
 
-  useEffect(() => {
-    const processCategory = (data: any, categoryKey: string, tempItems: PackingItem[]) => {
-      if (data?.items) {
-        const insights = data.insight || '';
-        const toggle = data.toggleHidePackedItems || false;
-        ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
-          data.items[group]?.forEach((item: any, index: number) => {
-            tempItems.push({
-              id: `${categoryKey}-${group.toLowerCase()}-${index}`,
-              name: item.name,
-              category: categoryKey,
-              source: item.tag,
-              note: item.tooltip,
-              isChecked: false,
-              tooltip: item.tooltip,
-              storeSuggestions: item.storeSuggestions,
-              studentTip: item.studentTip
-            });
+  // Initial packing items data
+  const generateInitialItems = (): PackingItem[] => {
+    const items: PackingItem[] = [];
+
+    // Process clothing items from JSON
+    if (clothingData && clothingData.items) {
+      // Process mustBring items
+      if (clothingData.items.mustBring) {
+        clothingData.items.mustBring.forEach((item, index) => {
+          items.push({
+            id: `clothing-mustbring-${index}`,
+            name: item.name,
+            category: 'clothing',
+            source: 'Pack from India',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
           });
         });
-        return { insights, toggle };
       }
-      return null;
-    };
 
-    const tempItems: PackingItem[] = [];
-    const insightsObj: Record<string, string> = {};
-    const toggleObj: Record<string, boolean> = {};
+      // Process optional items
+      if (clothingData.items.optional) {
+        clothingData.items.optional.forEach((item, index) => {
+          items.push({
+            id: `clothing-optional-${index}`,
+            name: item.name,
+            category: 'clothing',
+            source: 'Optional',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
+        });
+      }
 
-    const clothingResult = processCategory(clothingData, 'clothing', tempItems);
-    if (clothingResult) {
-      insightsObj['clothing'] = clothingResult.insights;
-      toggleObj['clothing'] = clothingResult.toggle;
+      // Process buyInFrance items
+      if (clothingData.items.buyInFrance) {
+        clothingData.items.buyInFrance.forEach((item, index) => {
+          items.push({
+            id: `clothing-buyinfrance-${index}`,
+            name: item.name,
+            category: 'clothing',
+            source: 'Buy in France',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
+        });
+      }
     }
 
-    const foodResult = processCategory(foodData, 'food', tempItems);
-    if (foodResult) {
-      insightsObj['food'] = foodResult.insights;
-      toggleObj['food'] = foodResult.toggle;
-    }
-
-    const kitchenResult = processCategory(kitchenData, 'kitchen', tempItems);
-    if (kitchenResult) {
-      insightsObj['kitchen'] = kitchenResult.insights;
-      toggleObj['kitchen'] = kitchenResult.toggle;
-    }
-
-    // Hardcoded Electronics
-    tempItems.push(
-      { id: 'electronics-0', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
-      { id: 'electronics-1', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets', isChecked: false },
-      { id: 'electronics-2', name: 'Smartphone', category: 'electronics', source: 'Pack from India', note: 'Ensure it\'s unlocked for French SIM', isChecked: false },
-      { id: 'electronics-3', name: 'Headphones', category: 'electronics', source: 'Pack from India', note: 'Useful for online classes', isChecked: false },
-      { id: 'electronics-4', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' }
+    // Add hardcoded items for other categories
+    items.push(
+    // Food & Groceries
+    { id: '10', name: 'Basic Spices (small packs)', category: 'food', source: 'Pack from India', note: 'Garam masala, turmeric, cumin, etc.', isChecked: false },
+    { id: '11', name: 'Instant Foods', category: 'food', source: 'Pack from India', note: 'Ready-to-eat curries, MTR packets', isChecked: false },
+    { id: '12', name: 'Pickles (small jar)', category: 'food', source: 'Pack from India', note: 'Comfort food from home', isChecked: false },
+    { id: '13', name: 'Snacks', category: 'food', source: 'Optional', note: 'Bring favorites for initial days', isChecked: false },
+    { id: '14', name: 'Staples (rice, dal)', category: 'food', source: 'Buy in France', note: 'Available at Asian stores', isChecked: false, storeInfo: 'Tang Frères, local Asian markets', priceRange: 'Varies' },
+    
+    // Kitchen Essentials
+    { id: '15', name: 'Pressure Cooker (small)', category: 'kitchen', source: 'Pack from India', note: 'Essential for Indian cooking, hard to find in France', isChecked: false },
+    { id: '16', name: 'Small Tadka Pan', category: 'kitchen', source: 'Pack from India', note: 'For tempering spices', isChecked: false },
+    { id: '17', name: 'Basic Utensils', category: 'kitchen', source: 'Buy in France', note: 'Plates, cups, cutlery', isChecked: false, storeInfo: 'Carrefour, Action', priceRange: '€15-30 total' },
+    { id: '18', name: 'Rice Cooker', category: 'kitchen', source: 'Optional', note: 'Useful but takes luggage space', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€20-40' },
+    
+    // Electronics
+    { id: '19', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
+    { id: '20', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets (different from India)', isChecked: false },
+    { id: '21', name: 'Smartphone', category: 'electronics', source: 'Pack from India', note: 'Ensure it\'s unlocked for French SIM', isChecked: false },
+    { id: '22', name: 'Headphones', category: 'electronics', source: 'Pack from India', note: 'Useful for online classes and calls', isChecked: false },
+    { id: '23', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' },
+    
+    // Accommodation Setup
+    { id: '24', name: 'Bedsheets & Pillowcases', category: 'accommodation', source: 'Buy in France', note: 'French beds may have different sizes', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€20-40' },
+    { id: '25', name: 'Towels', category: 'accommodation', source: 'Buy in France', note: 'Save luggage space', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€10-30' },
+    { id: '26', name: 'Small Desk Lamp', category: 'accommodation', source: 'Buy in France', note: 'For study area', isChecked: false, storeInfo: 'IKEA, Action', priceRange: '€10-20' },
+    
+    // Toiletries & Personal Care
+    { id: '27', name: 'Medications', category: 'toiletries', source: 'Pack from India', note: 'Bring prescription meds & basics for first month', isChecked: false },
+    { id: '28', name: 'Toiletries', category: 'toiletries', source: 'Buy in France', note: 'Shampoo, soap, etc. - save luggage weight', isChecked: false, storeInfo: 'Carrefour, Monoprix', priceRange: '€10-30' },
+    { id: '29', name: 'Eyeglasses/Contacts', category: 'toiletries', source: 'Pack from India', note: 'Bring extra pair & prescription', isChecked: false },
+    { id: '30', name: 'Skincare Products', category: 'toiletries', source: 'Optional', note: 'Bring favorites, but French pharmacies are excellent', isChecked: false }
     );
+    return items;
+  };
 
-    setPackingItems(tempItems);
-    setCategoryInsights(insightsObj);
-    setAutoToggleHidePacked(toggleObj);
-  }, []);
+  const initialPackingItems = generateInitialItems();
 
-  useEffect(() => {
-    if (selectedCategory && autoToggleHidePacked[selectedCategory] !== undefined) {
-      setHidePacked(autoToggleHidePacked[selectedCategory]);
-    }
-  }, [selectedCategory, autoToggleHidePacked]);
-
+  // Load items from localStorage on mount
   useEffect(() => {
     const savedItems = localStorage.getItem('packingItems');
     if (savedItems) {
       setPackingItems(JSON.parse(savedItems));
+    } else {
+      setPackingItems(initialPackingItems);
     }
   }, []);
 
+  // Save to localStorage whenever items change
   useEffect(() => {
     if (packingItems.length > 0) {
       localStorage.setItem('packingItems', JSON.stringify(packingItems));
     }
   }, [packingItems]);
 
+  // Calculate progress
   const totalItems = packingItems.length;
   const checkedItems = packingItems.filter(item => item.isChecked).length;
   const progressPercentage = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
 
+  // Celebrate with confetti when progress reaches 100%
   useEffect(() => {
     if (progressPercentage >= 100 && !justCompleted) {
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
       setJustCompleted(true);
     }
   }, [progressPercentage, justCompleted]);
 
   const handleItemCheck = (id: string, checked: boolean) => {
-    setPackingItems(prev =>
-      prev.map(item =>
+    setPackingItems(prev => 
+      prev.map(item => 
         item.id === id ? { ...item, isChecked: checked } : item
       )
     );
@@ -166,7 +200,11 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     };
 
     setPackingItems(prev => [...prev, newItemComplete]);
-    setNewItem({ name: '', source: 'Pack from India', note: '' });
+    setNewItem({
+      name: '',
+      source: 'Pack from India',
+      note: ''
+    });
 
     uiToast({
       title: "Item Added",
@@ -176,13 +214,15 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
 
   const handleExport = () => {
     const dataStr = JSON.stringify(packingItems, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
     const exportFileDefaultName = `packing-list-${selectedLocation}.json`;
+    
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-
+    
     uiToast({
       title: "List Exported",
       description: "Your packing list has been exported as JSON."
@@ -191,15 +231,44 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
 
   const handleReset = () => {
     if (confirm('Are you sure you want to reset your packing list? This will remove all your customizations.')) {
-      window.location.reload();
+      setPackingItems(initialPackingItems);
+      uiToast({
+        title: "List Reset",
+        description: "Your packing list has been reset to default items."
+      });
     }
   };
 
+  // Filter items by current category and hide packed if needed
   const filteredItems = packingItems.filter(item => {
     if (item.category !== selectedCategory) return false;
     if (hidePacked && item.isChecked) return false;
     return true;
   });
+
+  // Category icons mapping
+  const categoryIcons = {
+    clothing: <Shirt className="h-5 w-5" />,
+    food: <Utensils className="h-5 w-5" />,
+    kitchen: <Utensils className="h-5 w-5" />,
+    electronics: <Plug className="h-5 w-5" />,
+    accommodation: <Home className="h-5 w-5" />,
+    toiletries: <Droplet className="h-5 w-5" />
+  };
+
+  // Source badge colors
+  const getSourceBadgeColor = (source: string) => {
+    switch (source) {
+      case 'Pack from India':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'Buy in France':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Optional':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
