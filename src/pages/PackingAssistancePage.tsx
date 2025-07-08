@@ -13,6 +13,7 @@ import { ArrowLeft, Info, Plus, Download, Save, MapPin, Filter, ShoppingBag, Shi
 import { toast } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
 import clothingData from '@/data/clothing.json';
+import confetti from 'canvas-confetti';
 
 
 interface PackingItem {
@@ -38,6 +39,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const [selectedLocation, setSelectedLocation] = useState('Rouen');
   const [selectedCategory, setSelectedCategory] = useState('clothing');
   const [packingItems, setPackingItems] = useState<PackingItem[]>([]);
+  const [justCompleted, setJustCompleted] = useState(false);
   const [hidePacked, setHidePacked] = useState(false);
   const [newItem, setNewItem] = useState<Omit<PackingItem, 'id' | 'isChecked' | 'category'>>({
     name: '',
@@ -48,34 +50,39 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   // Initial packing items data
   const generateInitialItems = (): PackingItem[] => {
     const items: PackingItem[] = [];
-    
-    // Add clothing items from the JSON data
-    clothingData.items.forEach((item, index) => {
-      const source = item.packFromIndia 
-        ? 'Pack from India' 
-        : item.buyInRouen 
-          ? 'Buy in France' 
-          : 'Optional';
-      
-      const storeInfo = item.stores.length > 0 
-        ? item.stores.map(store => `${store.name} (${store.price})`).join(', ')
-        : '';
-      
-      items.push({
-        id: `clothing-${index}`,
-        name: item.name,
-        category: 'clothing',
-        source: source,
-        note: item.why,
-        isChecked: false,
-        storeInfo: storeInfo,
-        priceRange: item.stores.length > 0 ? item.stores[0].price : ''
+
+    // Process clothing items from JSON
+    if (clothingData && clothingData.items) {
+      clothingData.items.forEach((item, index) => {
+        let source: 'Pack from India' | 'Buy in France' | 'Optional';
+        
+        if (item.packFromIndia) {
+          source = 'Pack from India';
+        } else if (item.buyInRouen) {
+          source = 'Buy in France';
+        } else {
+          source = 'Optional';
+        }
+        
+        const storeInfo = item.stores && item.stores.length > 0 
+          ? item.stores.map(store => `${store.name} (${store.price})`).join(', ')
+          : '';
+        
+        items.push({
+          id: `clothing-${index}`,
+          name: item.name,
+          category: 'clothing',
+          source: source,
+          note: item.why,
+          isChecked: false,
+          storeInfo: storeInfo,
+          priceRange: item.stores && item.stores.length > 0 ? item.stores[0].price : ''
+        });
       });
-    });
-    
-    // Add the rest of the hardcoded items for other categories
-    return [
-      ...items,
+    }
+
+    // Add hardcoded items for other categories
+    items.push(
     // Food & Groceries
     { id: '10', name: 'Basic Spices (small packs)', category: 'food', source: 'Pack from India', note: 'Garam masala, turmeric, cumin, etc.', isChecked: false },
     { id: '11', name: 'Instant Foods', category: 'food', source: 'Pack from India', note: 'Ready-to-eat curries, MTR packets', isChecked: false },
@@ -106,7 +113,8 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     { id: '28', name: 'Toiletries', category: 'toiletries', source: 'Buy in France', note: 'Shampoo, soap, etc. - save luggage weight', isChecked: false, storeInfo: 'Carrefour, Monoprix', priceRange: '€10-30' },
     { id: '29', name: 'Eyeglasses/Contacts', category: 'toiletries', source: 'Pack from India', note: 'Bring extra pair & prescription', isChecked: false },
     { id: '30', name: 'Skincare Products', category: 'toiletries', source: 'Optional', note: 'Bring favorites, but French pharmacies are excellent', isChecked: false }
-    ];
+    );
+    return items;
   };
 
   const initialPackingItems = generateInitialItems();
@@ -127,6 +135,23 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       localStorage.setItem('packingItems', JSON.stringify(packingItems));
     }
   }, [packingItems]);
+
+  // Calculate progress
+  const totalItems = packingItems.length;
+  const checkedItems = packingItems.filter(item => item.isChecked).length;
+  const progressPercentage = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
+
+  // Celebrate with confetti when progress reaches 100%
+  useEffect(() => {
+    if (progressPercentage >= 100 && !justCompleted) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+      setJustCompleted(true);
+    }
+  }, [progressPercentage, justCompleted]);
 
   const handleItemCheck = (id: string, checked: boolean) => {
     setPackingItems(prev => 
@@ -198,11 +223,6 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     if (hidePacked && item.isChecked) return false;
     return true;
   });
-  
-  // Calculate progress
-  const totalItems = packingItems.length;
-  const checkedItems = packingItems.filter(item => item.isChecked).length;
-  const progressPercentage = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
 
   // Category icons mapping
   const categoryIcons = {
@@ -244,7 +264,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             🎒 Packing Assistance
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Plan your luggage smartly. Know what to bring, what to skip, and what to buy locally.
           </p>
         </div>
@@ -254,7 +274,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       <Card className="mb-6">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold text-gray-900">Packing Progress</h3>
+            <h3 className="font-semibold text-gray-900">Your Packing Progress</h3>
             <span className="text-sm font-medium text-blue-600">{checkedItems} of {totalItems} items</span>
           </div>
           <Progress value={progressPercentage} className="h-2" />
@@ -266,7 +286,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
         </CardContent>
       </Card>
 
-      {/* Location Filter */}
+      {/* Location Selector */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <MapPin className="h-4 w-4 text-gray-500" />
@@ -283,7 +303,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
             <SelectItem value="Lille" disabled>Lille (Coming Soon)</SelectItem>
           </SelectContent>
         </Select>
-        <div className="mt-2 text-xs text-gray-500 flex items-center">
+        <div className="mt-2 text-xs text-gray-500 flex items-center gap-1">
           <Info className="h-3 w-3 mr-1" />
           More cities will be added soon. Currently optimized for students in Rouen.
         </div>
@@ -292,7 +312,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       {/* Category Tabs */}
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="mb-6">
         <TabsList className="grid grid-cols-3 md:grid-cols-6">
-          <TabsTrigger value="clothing" className="flex items-center gap-1">
+          <TabsTrigger value="clothing" className="flex items-center gap-1 text-xs md:text-sm">
             <Shirt className="h-4 w-4" />
             <span className="hidden md:inline">Clothing</span>
           </TabsTrigger>
@@ -325,7 +345,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
           <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
             {categoryIcons[selectedCategory as keyof typeof categoryIcons]}
             {selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)} Items
-          </h2>
+          </h2> 
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleExport}>
               <Download className="h-4 w-4 mr-2" />
@@ -338,7 +358,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
         </div>
 
         <div className="flex items-center mb-4">
-          <Checkbox 
+          <Checkbox
             id="hide-packed" 
             checked={hidePacked}
             onCheckedChange={(checked) => setHidePacked(!!checked)}
@@ -354,7 +374,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
         {filteredItems.length === 0 ? (
           <Card>
             <CardContent className="p-6 text-center">
-              <p className="text-gray-500">
+              <p className="text-gray-500 py-4">
                 {hidePacked 
                   ? "All items in this category are packed! 🎉" 
                   : "No items in this category. Add some below!"}
@@ -362,7 +382,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
             </CardContent>
           </Card>
         ) : (
-          filteredItems.map(item => (
+          filteredItems.map((item) => (
             <Card key={item.id} className={`transition-all duration-200 ${item.isChecked ? 'bg-gray-50' : ''}`}>
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
@@ -372,7 +392,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                     onCheckedChange={(checked) => handleItemCheck(item.id, checked === true)}
                     className="mt-1"
                   />
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       <Label 
                         htmlFor={`item-${item.id}`}
@@ -381,7 +401,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                         {item.name}
                       </Label>
                       <Badge className={`${getSourceBadgeColor(item.source)} text-xs`}>
-                        {item.source}
+                        {item.source} 
                       </Badge>
                       {item.isUserAdded && (
                         <Badge variant="outline" className="text-xs">
@@ -389,7 +409,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                         </Badge>
                       )}
                     </div>
-                    {item.note && (
+                    {item.note && ( 
                       <p className="text-sm text-gray-600 mb-1">{item.note}</p>
                     )}
                     {(item.storeInfo || item.priceRange) && (
@@ -399,7 +419,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                         {item.priceRange && <span>{item.priceRange}</span>}
                       </div>
                     )}
-                    {item.studentTip && (
+                    {item.studentTip && ( 
                       <div className="bg-blue-50 p-2 rounded-md text-xs text-blue-700 mt-1">
                         <span className="font-medium">Student Tip:</span> {item.studentTip}
                       </div>
@@ -418,7 +438,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       </div>
 
       {/* Add New Item */}
-      <Card>
+      <Card className="mb-8">
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Plus className="h-5 w-5" />
@@ -426,7 +446,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"> 
             <div>
               <Label htmlFor="item-name" className="mb-2 block">Item Name</Label>
               <Input 
@@ -435,7 +455,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                 value={newItem.name}
                 onChange={(e) => setNewItem({...newItem, name: e.target.value})}
               />
-            </div>
+            </div> 
             <div>
               <Label htmlFor="item-source" className="mb-2 block">Source</Label>
               <Select 
@@ -453,7 +473,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
               </Select>
             </div>
           </div>
-          <div className="mb-4">
+          <div className="mb-4"> 
             <Label htmlFor="item-note" className="mb-2 block">Note (Optional)</Label>
             <Textarea 
               id="item-note"
@@ -462,7 +482,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
               onChange={(e) => setNewItem({...newItem, note: e.target.value})}
             />
           </div>
-          <Button onClick={handleAddItem}>
+          <Button onClick={handleAddItem} className="w-full md:w-auto">
             <Plus className="h-4 w-4 mr-2" />
             Add Item
           </Button>
@@ -470,7 +490,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       </Card>
 
       {/* Tips Section */}
-      <Card className="mt-8 bg-blue-50">
+      <Card className="bg-blue-50">
         <CardContent className="p-6">
           <h3 className="font-semibold text-blue-900 mb-3">💡 Packing Tips</h3>
           <ul className="space-y-2 text-blue-800 text-sm">
@@ -483,7 +503,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
         </CardContent>
       </Card>
 
-      <div className="mt-4 text-center text-sm text-gray-500">
+      <div className="mt-4 text-center text-sm text-gray-500 mb-8">
         Progress: {checkedItems} of {totalItems} items packed
       </div>
     </div>
