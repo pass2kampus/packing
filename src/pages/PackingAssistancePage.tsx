@@ -13,6 +13,7 @@ import { ArrowLeft, Info, Plus, Download, Save, MapPin, Filter, ShoppingBag, Shi
 import { toast } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
 import clothingData from '@/data/clothing.json';
+import foodData from '@/data/food.json';
 import confetti from 'canvas-confetti';
 
 
