@@ -27,8 +27,6 @@ interface PackingItem {
   tooltip?: string;
   storeSuggestions?: string[];
   studentTip?: string;
-  storeInfo?: string;
-  priceRange?: string;
 }
 
 interface PackingAssistancePageProps {
@@ -53,32 +51,56 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
 
     // Process clothing items from JSON
     if (clothingData && clothingData.items) {
-      clothingData.items.forEach((item, index) => {
-        let source: 'Pack from India' | 'Buy in France' | 'Optional';
-        
-        if (item.packFromIndia) {
-          source = 'Pack from India';
-        } else if (item.buyInRouen) {
-          source = 'Buy in France';
-        } else {
-          source = 'Optional';
-        }
-        
-        const storeInfo = item.stores && item.stores.length > 0 
-          ? item.stores.map(store => `${store.name} (${store.price})`).join(', ')
-          : '';
-        
-        items.push({
-          id: `clothing-${index}`,
-          name: item.name,
-          category: 'clothing',
-          source: source,
-          note: item.why,
-          isChecked: false,
-          storeInfo: storeInfo,
-          priceRange: item.stores && item.stores.length > 0 ? item.stores[0].price : ''
+      // Process mustBring items
+      if (clothingData.items.mustBring) {
+        clothingData.items.mustBring.forEach((item, index) => {
+          items.push({
+            id: `clothing-mustbring-${index}`,
+            name: item.name,
+            category: 'clothing',
+            source: 'Pack from India',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
         });
-      });
+      }
+
+      // Process optional items
+      if (clothingData.items.optional) {
+        clothingData.items.optional.forEach((item, index) => {
+          items.push({
+            id: `clothing-optional-${index}`,
+            name: item.name,
+            category: 'clothing',
+            source: 'Optional',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
+        });
+      }
+
+      // Process buyInFrance items
+      if (clothingData.items.buyInFrance) {
+        clothingData.items.buyInFrance.forEach((item, index) => {
+          items.push({
+            id: `clothing-buyinfrance-${index}`,
+            name: item.name,
+            category: 'clothing',
+            source: 'Buy in France',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
+        });
+      }
     }
 
     // Add hardcoded items for other categories
@@ -417,6 +439,12 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                         <ShoppingBag className="h-3 w-3 mr-1" />
                         {item.storeInfo && <span className="mr-2">{item.storeInfo}</span>}
                         {item.priceRange && <span>{item.priceRange}</span>}
+                      </div>
+                    )}
+                    {item.storeSuggestions && item.storeSuggestions.length > 0 && (
+                      <div className="flex items-center text-xs text-gray-500 mb-1">
+                        <ShoppingBag className="h-3 w-3 mr-1" />
+                        <span>{item.storeSuggestions.join(', ')}</span>
                       </div>
                     )}
                     {item.studentTip && ( 
