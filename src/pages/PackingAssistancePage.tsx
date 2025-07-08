@@ -14,6 +14,7 @@ import { toast } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
 import clothingData from '@/data/clothing.json';
 
+
 interface PackingItem {
   id: string;
   name: string;
@@ -37,7 +38,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const [selectedLocation, setSelectedLocation] = useState('Rouen');
   const [selectedCategory, setSelectedCategory] = useState('clothing');
   const [packingItems, setPackingItems] = useState<PackingItem[]>([]);
-  const [hidePacked, setHidePacked] = useState(clothingData.toggleHidePackedItems || false);
+  const [hidePacked, setHidePacked] = useState(false);
   const [newItem, setNewItem] = useState<Omit<PackingItem, 'id' | 'isChecked' | 'category'>>({
     name: '',
     source: 'Pack from India',
@@ -48,56 +49,29 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const generateInitialItems = (): PackingItem[] => {
     const items: PackingItem[] = [];
     
-    // Add clothing items from JSON
-    if (clothingData && clothingData.items) {
-      // Add "Must Bring" items
-      clothingData.items.mustBring?.forEach((item, index) => {
-        items.push({
-          id: `clothing-mustBring-${index}`,
-          name: item.name,
-          category: 'clothing',
-          source: 'Pack from India',
-          note: item.studentTip,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip,
-          isChecked: false,
-          storeInfo: item.storeSuggestions?.join(', ')
-        });
-      });
+    // Add clothing items from the JSON data
+    clothingData.items.forEach((item, index) => {
+      const source = item.packFromIndia 
+        ? 'Pack from India' 
+        : item.buyInRouen 
+          ? 'Buy in France' 
+          : 'Optional';
       
-      // Add "Optional" items
-      clothingData.items.optional?.forEach((item, index) => {
-        items.push({
-          id: `clothing-optional-${index}`,
-          name: item.name,
-          category: 'clothing',
-          source: 'Optional',
-          note: item.studentTip,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip,
-          isChecked: false,
-          storeInfo: item.storeSuggestions?.join(', ')
-        });
-      });
+      const storeInfo = item.stores.length > 0 
+        ? item.stores.map(store => `${store.name} (${store.price})`).join(', ')
+        : '';
       
-      // Add "Buy in France" items
-      clothingData.items.buyInFrance?.forEach((item, index) => {
-        items.push({
-          id: `clothing-buyInFrance-${index}`,
-          name: item.name,
-          category: 'clothing',
-          source: 'Buy in France',
-          note: item.studentTip,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip,
-          isChecked: false,
-          storeInfo: item.storeSuggestions?.join(', ')
-        });
+      items.push({
+        id: `clothing-${index}`,
+        name: item.name,
+        category: 'clothing',
+        source: source,
+        note: item.why,
+        isChecked: false,
+        storeInfo: storeInfo,
+        priceRange: item.stores.length > 0 ? item.stores[0].price : ''
       });
-    }
+    });
     
     // Add the rest of the hardcoded items for other categories
     return [
@@ -498,7 +472,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       {/* Tips Section */}
       <Card className="mt-8 bg-blue-50">
         <CardContent className="p-6">
-          <h3 className="font-semibold text-blue-900 mb-3">💡 {selectedCategory === 'clothing' ? clothingData.insight : 'Packing Tips'}</h3>
+          <h3 className="font-semibold text-blue-900 mb-3">💡 Packing Tips</h3>
           <ul className="space-y-2 text-blue-800 text-sm">
             <li>• Pack light - you can buy most things in France</li>
             <li>• Bring a universal adapter for your electronics</li>
