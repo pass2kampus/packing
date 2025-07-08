@@ -105,80 +105,81 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     }
 
     // Process food items from JSON
-  if (foodData && foodData.items) {
-    if (foodData.items.mustBring) {
-      foodData.items.mustBring.forEach((item, index) => {
-        items.push({
-          id: `food-mustbring-${index}`,
-          name: item.name,
-          category: 'food',
-          source: 'Pack from India',
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
+    if (foodData && foodData.items) {
+      if (foodData.items.mustBring) {
+        foodData.items.mustBring.forEach((item, index) => {
+          items.push({
+            id: `food-mustbring-${index}`,
+            name: item.name,
+            category: 'food',
+            source: 'Pack from India',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
         });
-      });
-    }
+      }
 
-    if (foodData.items.optional) {
-      foodData.items.optional.forEach((item, index) => {
-        items.push({
-          id: `food-optional-${index}`,
-          name: item.name,
-          category: 'food',
-          source: 'Optional',
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
+      if (foodData.items.optional) {
+        foodData.items.optional.forEach((item, index) => {
+          items.push({
+            id: `food-optional-${index}`,
+            name: item.name,
+            category: 'food',
+            source: 'Optional',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
         });
-      });
-    }
+      }
 
-    if (foodData.items.buyInFrance) {
-      foodData.items.buyInFrance.forEach((item, index) => {
-        items.push({
-          id: `food-buyinfrance-${index}`,
-          name: item.name,
-          category: 'food',
-          source: 'Buy in France',
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
+      if (foodData.items.buyInFrance) {
+        foodData.items.buyInFrance.forEach((item, index) => {
+          items.push({
+            id: `food-buyinfrance-${index}`,
+            name: item.name,
+            category: 'food',
+            source: 'Buy in France',
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
         });
-      });
+      }
     }
   
     // Add hardcoded items for other categories
     items.push(
-    // Kitchen Essentials
-    { id: '15', name: 'Pressure Cooker (small)', category: 'kitchen', source: 'Pack from India', note: 'Essential for Indian cooking, hard to find in France', isChecked: false },
-    { id: '16', name: 'Small Tadka Pan', category: 'kitchen', source: 'Pack from India', note: 'For tempering spices', isChecked: false },
-    { id: '17', name: 'Basic Utensils', category: 'kitchen', source: 'Buy in France', note: 'Plates, cups, cutlery', isChecked: false, storeInfo: 'Carrefour, Action', priceRange: '€15-30 total' },
-    { id: '18', name: 'Rice Cooker', category: 'kitchen', source: 'Optional', note: 'Useful but takes luggage space', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€20-40' },
+      // Kitchen Essentials
+      { id: '15', name: 'Pressure Cooker (small)', category: 'kitchen', source: 'Pack from India', note: 'Essential for Indian cooking, hard to find in France', isChecked: false },
+      { id: '16', name: 'Small Tadka Pan', category: 'kitchen', source: 'Pack from India', note: 'For tempering spices', isChecked: false },
+      { id: '17', name: 'Basic Utensils', category: 'kitchen', source: 'Buy in France', note: 'Plates, cups, cutlery', isChecked: false, storeInfo: 'Carrefour, Action', priceRange: '€15-30 total' },
+      { id: '18', name: 'Rice Cooker', category: 'kitchen', source: 'Optional', note: 'Useful but takes luggage space', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€20-40' },
     
-    // Electronics
-    { id: '19', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
-    { id: '20', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets (different from India)', isChecked: false },
-    { id: '21', name: 'Smartphone', category: 'electronics', source: 'Pack from India', note: 'Ensure it\'s unlocked for French SIM', isChecked: false },
-    { id: '22', name: 'Headphones', category: 'electronics', source: 'Pack from India', note: 'Useful for online classes and calls', isChecked: false },
-    { id: '23', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' },
+      // Electronics
+      { id: '19', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
+      { id: '20', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets (different from India)', isChecked: false },
+      { id: '21', name: 'Smartphone', category: 'electronics', source: 'Pack from India', note: 'Ensure it\'s unlocked for French SIM', isChecked: false },
+      { id: '22', name: 'Headphones', category: 'electronics', source: 'Pack from India', note: 'Useful for online classes and calls', isChecked: false },
+      { id: '23', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' },
     
-    // Accommodation Setup
-    { id: '24', name: 'Bedsheets & Pillowcases', category: 'accommodation', source: 'Buy in France', note: 'French beds may have different sizes', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€20-40' },
-    { id: '25', name: 'Towels', category: 'accommodation', source: 'Buy in France', note: 'Save luggage space', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€10-30' },
-    { id: '26', name: 'Small Desk Lamp', category: 'accommodation', source: 'Buy in France', note: 'For study area', isChecked: false, storeInfo: 'IKEA, Action', priceRange: '€10-20' },
+      // Accommodation Setup
+      { id: '24', name: 'Bedsheets & Pillowcases', category: 'accommodation', source: 'Buy in France', note: 'French beds may have different sizes', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€20-40' },
+      { id: '25', name: 'Towels', category: 'accommodation', source: 'Buy in France', note: 'Save luggage space', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€10-30' },
+      { id: '26', name: 'Small Desk Lamp', category: 'accommodation', source: 'Buy in France', note: 'For study area', isChecked: false, storeInfo: 'IKEA, Action', priceRange: '€10-20' },
     
-    // Toiletries & Personal Care
-    { id: '27', name: 'Medications', category: 'toiletries', source: 'Pack from India', note: 'Bring prescription meds & basics for first month', isChecked: false },
-    { id: '28', name: 'Toiletries', category: 'toiletries', source: 'Buy in France', note: 'Shampoo, soap, etc. - save luggage weight', isChecked: false, storeInfo: 'Carrefour, Monoprix', priceRange: '€10-30' },
-    { id: '29', name: 'Eyeglasses/Contacts', category: 'toiletries', source: 'Pack from India', note: 'Bring extra pair & prescription', isChecked: false },
-    { id: '30', name: 'Skincare Products', category: 'toiletries', source: 'Optional', note: 'Bring favorites, but French pharmacies are excellent', isChecked: false }
+      // Toiletries & Personal Care
+      { id: '27', name: 'Medications', category: 'toiletries', source: 'Pack from India', note: 'Bring prescription meds & basics for first month', isChecked: false },
+      { id: '28', name: 'Toiletries', category: 'toiletries', source: 'Buy in France', note: 'Shampoo, soap, etc. - save luggage weight', isChecked: false, storeInfo: 'Carrefour, Monoprix', priceRange: '€10-30' },
+      { id: '29', name: 'Eyeglasses/Contacts', category: 'toiletries', source: 'Pack from India', note: 'Bring extra pair & prescription', isChecked: false },
+      { id: '30', name: 'Skincare Products', category: 'toiletries', source: 'Optional', note: 'Bring favorites, but French pharmacies are excellent', isChecked: false }
     );
     return items;
   };
