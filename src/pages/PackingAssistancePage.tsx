@@ -152,7 +152,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
         });
       });
     }
-  }
+  
     // Add hardcoded items for other categories
     items.push(
     // Kitchen Essentials
