@@ -103,15 +103,58 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       }
     }
 
+    // Process food items from JSON
+  if (foodData && foodData.items) {
+    if (foodData.items.mustBring) {
+      foodData.items.mustBring.forEach((item, index) => {
+        items.push({
+          id: `food-mustbring-${index}`,
+          name: item.name,
+          category: 'food',
+          source: 'Pack from India',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+
+    if (foodData.items.optional) {
+      foodData.items.optional.forEach((item, index) => {
+        items.push({
+          id: `food-optional-${index}`,
+          name: item.name,
+          category: 'food',
+          source: 'Optional',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+
+    if (foodData.items.buyInFrance) {
+      foodData.items.buyInFrance.forEach((item, index) => {
+        items.push({
+          id: `food-buyinfrance-${index}`,
+          name: item.name,
+          category: 'food',
+          source: 'Buy in France',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+  }
     // Add hardcoded items for other categories
     items.push(
-    // Food & Groceries
-    { id: '10', name: 'Basic Spices (small packs)', category: 'food', source: 'Pack from India', note: 'Garam masala, turmeric, cumin, etc.', isChecked: false },
-    { id: '11', name: 'Instant Foods', category: 'food', source: 'Pack from India', note: 'Ready-to-eat curries, MTR packets', isChecked: false },
-    { id: '12', name: 'Pickles (small jar)', category: 'food', source: 'Pack from India', note: 'Comfort food from home', isChecked: false },
-    { id: '13', name: 'Snacks', category: 'food', source: 'Optional', note: 'Bring favorites for initial days', isChecked: false },
-    { id: '14', name: 'Staples (rice, dal)', category: 'food', source: 'Buy in France', note: 'Available at Asian stores', isChecked: false, storeInfo: 'Tang Frères, local Asian markets', priceRange: 'Varies' },
-    
     // Kitchen Essentials
     { id: '15', name: 'Pressure Cooker (small)', category: 'kitchen', source: 'Pack from India', note: 'Essential for Indian cooking, hard to find in France', isChecked: false },
     { id: '16', name: 'Small Tadka Pan', category: 'kitchen', source: 'Pack from India', note: 'For tempering spices', isChecked: false },
