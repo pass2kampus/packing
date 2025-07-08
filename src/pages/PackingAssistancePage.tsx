@@ -14,6 +14,7 @@ import { toast } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
 import clothingData from '@/data/clothing.json';
 import foodData from '@/data/food.json';
+import kitchenData from '@/data/kitchen.json';
 import confetti from 'canvas-confetti';
 
 
@@ -50,15 +51,15 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const generateInitialItems = (): PackingItem[] => {
   const items: PackingItem[] = [];
 
-  // Process clothing items from JSON
-  if (clothingData && clothingData.items) {
-    if (clothingData.items.mustBring) {
-      clothingData.items.mustBring.forEach((item, index) => {
+  // Clothing
+  if (clothingData?.items) {
+    ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
+      clothingData.items[group]?.forEach((item, index) => {
         items.push({
-          id: `clothing-mustbring-${index}`,
+          id: `clothing-${group.toLowerCase()}-${index}`,
           name: item.name,
           category: 'clothing',
-          source: 'Pack from India',
+          source: item.tag as PackingItem['source'],
           note: item.tooltip,
           isChecked: false,
           tooltip: item.tooltip,
@@ -66,50 +67,18 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
           studentTip: item.studentTip
         });
       });
-    }
-
-    if (clothingData.items.optional) {
-      clothingData.items.optional.forEach((item, index) => {
-        items.push({
-          id: `clothing-optional-${index}`,
-          name: item.name,
-          category: 'clothing',
-          source: 'Optional',
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
-        });
-      });
-    }
-
-    if (clothingData.items.buyInFrance) {
-      clothingData.items.buyInFrance.forEach((item, index) => {
-        items.push({
-          id: `clothing-buyinfrance-${index}`,
-          name: item.name,
-          category: 'clothing',
-          source: 'Buy in France',
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
-        });
-      });
-    }
+    });
   }
 
-  // Process food items from JSON
-  if (foodData && foodData.items) {
-    if (foodData.items.mustBring) {
-      foodData.items.mustBring.forEach((item, index) => {
+  // Food
+  if (foodData?.items) {
+    ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
+      foodData.items[group]?.forEach((item, index) => {
         items.push({
-          id: `food-mustbring-${index}`,
+          id: `food-${group.toLowerCase()}-${index}`,
           name: item.name,
           category: 'food',
-          source: 'Pack from India',
+          source: item.tag as PackingItem['source'],
           note: item.tooltip,
           isChecked: false,
           tooltip: item.tooltip,
@@ -117,49 +86,30 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
           studentTip: item.studentTip
         });
       });
-    }
-
-    if (foodData.items.optional) {
-      foodData.items.optional.forEach((item, index) => {
-        items.push({
-          id: `food-optional-${index}`,
-          name: item.name,
-          category: 'food',
-          source: 'Optional',
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
-        });
-      });
-    }
-
-    if (foodData.items.buyInFrance) {
-      foodData.items.buyInFrance.forEach((item, index) => {
-        items.push({
-          id: `food-buyinfrance-${index}`,
-          name: item.name,
-          category: 'food',
-          source: 'Buy in France',
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
-        });
-      });
-    }
+    });
   }
 
-  // Add hardcoded items for other categories
+  // Kitchen
+  if (kitchenData?.items) {
+    ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
+      kitchenData.items[group]?.forEach((item, index) => {
+        items.push({
+          id: `kitchen-${group.toLowerCase()}-${index}`,
+          name: item.name,
+          category: 'kitchen',
+          source: item.tag as PackingItem['source'],
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    });
+  }
+
+  // Other categories still hardcoded
   items.push(
-    // Kitchen Essentials
-    { id: '15', name: 'Pressure Cooker (small)', category: 'kitchen', source: 'Pack from India', note: 'Essential for Indian cooking, hard to find in France', isChecked: false },
-    { id: '16', name: 'Small Tadka Pan', category: 'kitchen', source: 'Pack from India', note: 'For tempering spices', isChecked: false },
-    { id: '17', name: 'Basic Utensils', category: 'kitchen', source: 'Buy in France', note: 'Plates, cups, cutlery', isChecked: false, storeInfo: 'Carrefour, Action', priceRange: '€15-30 total' },
-    { id: '18', name: 'Rice Cooker', category: 'kitchen', source: 'Optional', note: 'Useful but takes luggage space', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€20-40' },
-
     // Electronics
     { id: '19', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
     { id: '20', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets (different from India)', isChecked: false },
@@ -167,12 +117,12 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     { id: '22', name: 'Headphones', category: 'electronics', source: 'Pack from India', note: 'Useful for online classes and calls', isChecked: false },
     { id: '23', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' },
 
-    // Accommodation Setup
+    // Accommodation
     { id: '24', name: 'Bedsheets & Pillowcases', category: 'accommodation', source: 'Buy in France', note: 'French beds may have different sizes', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€20-40' },
     { id: '25', name: 'Towels', category: 'accommodation', source: 'Buy in France', note: 'Save luggage space', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€10-30' },
     { id: '26', name: 'Small Desk Lamp', category: 'accommodation', source: 'Buy in France', note: 'For study area', isChecked: false, storeInfo: 'IKEA, Action', priceRange: '€10-20' },
 
-    // Toiletries & Personal Care
+    // Toiletries
     { id: '27', name: 'Medications', category: 'toiletries', source: 'Pack from India', note: 'Bring prescription meds & basics for first month', isChecked: false },
     { id: '28', name: 'Toiletries', category: 'toiletries', source: 'Buy in France', note: 'Shampoo, soap, etc. - save luggage weight', isChecked: false, storeInfo: 'Carrefour, Monoprix', priceRange: '€10-30' },
     { id: '29', name: 'Eyeglasses/Contacts', category: 'toiletries', source: 'Pack from India', note: 'Bring extra pair & prescription', isChecked: false },
@@ -181,6 +131,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
 
   return items;
 };
+
 
   const initialPackingItems = generateInitialItems();
 
