@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Info, Plus, Download, Save, MapPin, Filter, ShoppingBag, Shirt, Utensils, Plug, Home, Droplet } from 'lucide-react';
+import { ArrowLeft, Info, Plus, Download, ShoppingBag, Shirt, Utensils, Plug, Home, Droplet } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
 import clothingData from '@/data/clothing.json';
@@ -50,17 +50,14 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   });
   const { toast: uiToast } = useToast();
 
-  const generateInitialItems = (): PackingItem[] => {
-    const items: PackingItem[] = [];
-
-    const processCategory = (data: any, categoryKey: string) => {
+  useEffect(() => {
+    const processCategory = (data: any, categoryKey: string, tempItems: PackingItem[]) => {
       if (data?.items) {
-        setCategoryInsights(prev => ({ ...prev, [categoryKey]: data.insight || '' }));
-        setAutoToggleHidePacked(prev => ({ ...prev, [categoryKey]: data.toggleHidePackedItems || false }));
-
+        const insights = data.insight || '';
+        const toggle = data.toggleHidePackedItems || false;
         ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
           data.items[group]?.forEach((item: any, index: number) => {
-            items.push({
+            tempItems.push({
               id: `${categoryKey}-${group.toLowerCase()}-${index}`,
               name: item.name,
               category: categoryKey,
@@ -73,15 +70,35 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
             });
           });
         });
+        return { insights, toggle };
       }
+      return null;
     };
 
-    processCategory(clothingData, 'clothing');
-    processCategory(foodData, 'food');
-    processCategory(kitchenData, 'kitchen');
+    const tempItems: PackingItem[] = [];
+    const insightsObj: Record<string, string> = {};
+    const toggleObj: Record<string, boolean> = {};
+
+    const clothingResult = processCategory(clothingData, 'clothing', tempItems);
+    if (clothingResult) {
+      insightsObj['clothing'] = clothingResult.insights;
+      toggleObj['clothing'] = clothingResult.toggle;
+    }
+
+    const foodResult = processCategory(foodData, 'food', tempItems);
+    if (foodResult) {
+      insightsObj['food'] = foodResult.insights;
+      toggleObj['food'] = foodResult.toggle;
+    }
+
+    const kitchenResult = processCategory(kitchenData, 'kitchen', tempItems);
+    if (kitchenResult) {
+      insightsObj['kitchen'] = kitchenResult.insights;
+      toggleObj['kitchen'] = kitchenResult.toggle;
+    }
 
     // Hardcoded Electronics
-    items.push(
+    tempItems.push(
       { id: 'electronics-0', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
       { id: 'electronics-1', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets', isChecked: false },
       { id: 'electronics-2', name: 'Smartphone', category: 'electronics', source: 'Pack from India', note: 'Ensure it\'s unlocked for French SIM', isChecked: false },
@@ -89,17 +106,21 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       { id: 'electronics-4', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' }
     );
 
-    return items;
-  };
+    setPackingItems(tempItems);
+    setCategoryInsights(insightsObj);
+    setAutoToggleHidePacked(toggleObj);
+  }, []);
 
-  const initialPackingItems = generateInitialItems();
+  useEffect(() => {
+    if (selectedCategory && autoToggleHidePacked[selectedCategory] !== undefined) {
+      setHidePacked(autoToggleHidePacked[selectedCategory]);
+    }
+  }, [selectedCategory, autoToggleHidePacked]);
 
   useEffect(() => {
     const savedItems = localStorage.getItem('packingItems');
     if (savedItems) {
       setPackingItems(JSON.parse(savedItems));
-    } else {
-      setPackingItems(initialPackingItems);
     }
   }, []);
 
@@ -108,12 +129,6 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       localStorage.setItem('packingItems', JSON.stringify(packingItems));
     }
   }, [packingItems]);
-
-  useEffect(() => {
-    if (selectedCategory && autoToggleHidePacked[selectedCategory] !== undefined) {
-      setHidePacked(autoToggleHidePacked[selectedCategory]);
-    }
-  }, [selectedCategory, autoToggleHidePacked]);
 
   const totalItems = packingItems.length;
   const checkedItems = packingItems.filter(item => item.isChecked).length;
@@ -127,8 +142,8 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   }, [progressPercentage, justCompleted]);
 
   const handleItemCheck = (id: string, checked: boolean) => {
-    setPackingItems(prev => 
-      prev.map(item => 
+    setPackingItems(prev =>
+      prev.map(item =>
         item.id === id ? { ...item, isChecked: checked } : item
       )
     );
@@ -151,11 +166,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     };
 
     setPackingItems(prev => [...prev, newItemComplete]);
-    setNewItem({
-      name: '',
-      source: 'Pack from India',
-      note: ''
-    });
+    setNewItem({ name: '', source: 'Pack from India', note: '' });
 
     uiToast({
       title: "Item Added",
@@ -165,15 +176,13 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
 
   const handleExport = () => {
     const dataStr = JSON.stringify(packingItems, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const exportFileDefaultName = `packing-list-${selectedLocation}.json`;
-    
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
-    
+
     uiToast({
       title: "List Exported",
       description: "Your packing list has been exported as JSON."
@@ -182,44 +191,15 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
 
   const handleReset = () => {
     if (confirm('Are you sure you want to reset your packing list? This will remove all your customizations.')) {
-      setPackingItems(initialPackingItems);
-      uiToast({
-        title: "List Reset",
-        description: "Your packing list has been reset to default items."
-      });
+      window.location.reload();
     }
   };
 
-  // Filter items by current category and hide packed if needed
   const filteredItems = packingItems.filter(item => {
     if (item.category !== selectedCategory) return false;
     if (hidePacked && item.isChecked) return false;
     return true;
   });
-
-  // Category icons mapping
-  const categoryIcons = {
-    clothing: <Shirt className="h-5 w-5" />,
-    food: <Utensils className="h-5 w-5" />,
-    kitchen: <Utensils className="h-5 w-5" />,
-    electronics: <Plug className="h-5 w-5" />,
-    accommodation: <Home className="h-5 w-5" />,
-    toiletries: <Droplet className="h-5 w-5" />
-  };
-
-  // Source badge colors
-  const getSourceBadgeColor = (source: string) => {
-    switch (source) {
-      case 'Pack from India':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'Buy in France':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Optional':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <div className="max-w-4xl mx-auto">
