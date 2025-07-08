@@ -233,6 +233,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       });
     }
 
+
     // Process accommodation items from JSON
     if (accommodationData && Array.isArray(accommodationData)) {
       accommodationData.forEach((item, index) => {
