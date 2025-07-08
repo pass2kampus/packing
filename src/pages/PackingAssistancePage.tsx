@@ -219,7 +219,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
           ? 'Optional'
           : 'Buy in France';
 
-        packingItems.push({
+        items.push({
           id: `electronics-${index}`,
           name: item.item,
           category: 'electronics',
