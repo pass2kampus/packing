@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { ArrowLeft, Info, Plus, Download, Save, MapPin, Filter, ShoppingBag, Shirt, Utensils, Plug, Home, Droplet } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
+import clothingData from '@/data/clothing.json';
 
 interface PackingItem {
   id: string;
@@ -21,6 +22,9 @@ interface PackingItem {
   note?: string;
   isChecked: boolean;
   isUserAdded?: boolean;
+  tooltip?: string;
+  storeSuggestions?: string[];
+  studentTip?: string;
   storeInfo?: string;
   priceRange?: string;
 }
@@ -33,26 +37,71 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const [selectedLocation, setSelectedLocation] = useState('Rouen');
   const [selectedCategory, setSelectedCategory] = useState('clothing');
   const [packingItems, setPackingItems] = useState<PackingItem[]>([]);
+  const [hidePacked, setHidePacked] = useState(clothingData.toggleHidePackedItems || false);
   const [newItem, setNewItem] = useState<Omit<PackingItem, 'id' | 'isChecked' | 'category'>>({
     name: '',
     source: 'Pack from India',
   });
-  const [hidePacked, setHidePacked] = useState(false);
   const { toast: uiToast } = useToast();
 
   // Initial packing items data
-  const initialPackingItems: PackingItem[] = [
-    // Clothing
-    { id: '1', name: 'Winter Jacket', category: 'clothing', source: 'Buy in France', note: 'Decathlon has good options for €30-50', isChecked: false, storeInfo: 'Decathlon, Primark', priceRange: '€30-50' },
-    { id: '2', name: 'Thermal Underwear', category: 'clothing', source: 'Buy in France', note: 'Essential for winter months (Nov-Mar)', isChecked: false, storeInfo: 'Decathlon, Uniqlo', priceRange: '€15-25' },
-    { id: '3', name: 'Formal Attire (1-2 sets)', category: 'clothing', source: 'Pack from India', note: 'For presentations and formal events', isChecked: false },
-    { id: '4', name: 'Casual Clothes', category: 'clothing', source: 'Pack from India', note: 'Bring basics, buy seasonal items locally', isChecked: false },
-    { id: '5', name: 'Rain Jacket/Coat', category: 'clothing', source: 'Buy in France', note: 'France gets frequent rain', isChecked: false, storeInfo: 'Decathlon', priceRange: '€20-40' },
-    { id: '6', name: 'Comfortable Walking Shoes', category: 'clothing', source: 'Pack from India', note: 'You\'ll walk a lot in Europe', isChecked: false },
-    { id: '7', name: 'Winter Boots', category: 'clothing', source: 'Buy in France', note: 'For snow and heavy rain', isChecked: false, storeInfo: 'Decathlon, La Halle', priceRange: '€40-70' },
-    { id: '8', name: 'Scarves & Gloves', category: 'clothing', source: 'Buy in France', note: 'Essential for winter', isChecked: false, storeInfo: 'Primark, H&M', priceRange: '€10-20' },
-    { id: '9', name: 'Swimwear', category: 'clothing', source: 'Optional', note: 'For swimming pools or beach trips', isChecked: false },
+  const generateInitialItems = (): PackingItem[] => {
+    const items: PackingItem[] = [];
     
+    // Add clothing items from JSON
+    if (clothingData && clothingData.items) {
+      // Add "Must Bring" items
+      clothingData.items.mustBring?.forEach((item, index) => {
+        items.push({
+          id: `clothing-mustBring-${index}`,
+          name: item.name,
+          category: 'clothing',
+          source: 'Pack from India',
+          note: item.studentTip,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip,
+          isChecked: false,
+          storeInfo: item.storeSuggestions?.join(', ')
+        });
+      });
+      
+      // Add "Optional" items
+      clothingData.items.optional?.forEach((item, index) => {
+        items.push({
+          id: `clothing-optional-${index}`,
+          name: item.name,
+          category: 'clothing',
+          source: 'Optional',
+          note: item.studentTip,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip,
+          isChecked: false,
+          storeInfo: item.storeSuggestions?.join(', ')
+        });
+      });
+      
+      // Add "Buy in France" items
+      clothingData.items.buyInFrance?.forEach((item, index) => {
+        items.push({
+          id: `clothing-buyInFrance-${index}`,
+          name: item.name,
+          category: 'clothing',
+          source: 'Buy in France',
+          note: item.studentTip,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip,
+          isChecked: false,
+          storeInfo: item.storeSuggestions?.join(', ')
+        });
+      });
+    }
+    
+    // Add the rest of the hardcoded items for other categories
+    return [
+      ...items,
     // Food & Groceries
     { id: '10', name: 'Basic Spices (small packs)', category: 'food', source: 'Pack from India', note: 'Garam masala, turmeric, cumin, etc.', isChecked: false },
     { id: '11', name: 'Instant Foods', category: 'food', source: 'Pack from India', note: 'Ready-to-eat curries, MTR packets', isChecked: false },
@@ -83,7 +132,10 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     { id: '28', name: 'Toiletries', category: 'toiletries', source: 'Buy in France', note: 'Shampoo, soap, etc. - save luggage weight', isChecked: false, storeInfo: 'Carrefour, Monoprix', priceRange: '€10-30' },
     { id: '29', name: 'Eyeglasses/Contacts', category: 'toiletries', source: 'Pack from India', note: 'Bring extra pair & prescription', isChecked: false },
     { id: '30', name: 'Skincare Products', category: 'toiletries', source: 'Optional', note: 'Bring favorites, but French pharmacies are excellent', isChecked: false }
-  ];
+    ];
+  };
+
+  const initialPackingItems = generateInitialItems();
 
   // Load items from localStorage on mount
   useEffect(() => {
@@ -367,10 +419,20 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
                       <p className="text-sm text-gray-600 mb-1">{item.note}</p>
                     )}
                     {(item.storeInfo || item.priceRange) && (
-                      <div className="flex items-center text-xs text-gray-500">
+                      <div className="flex items-center text-xs text-gray-500 mb-1">
                         <ShoppingBag className="h-3 w-3 mr-1" />
                         {item.storeInfo && <span className="mr-2">{item.storeInfo}</span>}
                         {item.priceRange && <span>{item.priceRange}</span>}
+                      </div>
+                    )}
+                    {item.studentTip && (
+                      <div className="bg-blue-50 p-2 rounded-md text-xs text-blue-700 mt-1">
+                        <span className="font-medium">Student Tip:</span> {item.studentTip}
+                      </div>
+                    )}
+                    {item.tooltip && (
+                      <div className="text-xs text-gray-600 mt-1 italic">
+                        {item.tooltip}
                       </div>
                     )}
                   </div>
@@ -436,7 +498,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
       {/* Tips Section */}
       <Card className="mt-8 bg-blue-50">
         <CardContent className="p-6">
-          <h3 className="font-semibold text-blue-900 mb-3">💡 Packing Tips</h3>
+          <h3 className="font-semibold text-blue-900 mb-3">💡 {selectedCategory === 'clothing' ? clothingData.insight : 'Packing Tips'}</h3>
           <ul className="space-y-2 text-blue-800 text-sm">
             <li>• Pack light - you can buy most things in France</li>
             <li>• Bring a universal adapter for your electronics</li>
