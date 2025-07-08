@@ -17,7 +17,6 @@ import foodData from '@/data/food.json';
 import kitchenData from '@/data/kitchen.json';
 import confetti from 'canvas-confetti';
 
-
 interface PackingItem {
   id: string;
   name: string;
@@ -29,6 +28,8 @@ interface PackingItem {
   tooltip?: string;
   storeSuggestions?: string[];
   studentTip?: string;
+  storeInfo?: string;
+  priceRange?: string;
 }
 
 interface PackingAssistancePageProps {
@@ -41,101 +42,58 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const [packingItems, setPackingItems] = useState<PackingItem[]>([]);
   const [justCompleted, setJustCompleted] = useState(false);
   const [hidePacked, setHidePacked] = useState(false);
+  const [categoryInsights, setCategoryInsights] = useState<Record<string, string>>({});
+  const [autoToggleHidePacked, setAutoToggleHidePacked] = useState<Record<string, boolean>>({});
   const [newItem, setNewItem] = useState<Omit<PackingItem, 'id' | 'isChecked' | 'category'>>({
     name: '',
-    source: 'Pack from India',
+    source: 'Pack from India'
   });
   const { toast: uiToast } = useToast();
 
-  // Initial packing items data
   const generateInitialItems = (): PackingItem[] => {
-  const items: PackingItem[] = [];
+    const items: PackingItem[] = [];
 
-  // Clothing
-  if (clothingData?.items) {
-    ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
-      clothingData.items[group]?.forEach((item, index) => {
-        items.push({
-          id: `clothing-${group.toLowerCase()}-${index}`,
-          name: item.name,
-          category: 'clothing',
-          source: item.tag as PackingItem['source'],
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
+    const processCategory = (data: any, categoryKey: string) => {
+      if (data?.items) {
+        setCategoryInsights(prev => ({ ...prev, [categoryKey]: data.insight || '' }));
+        setAutoToggleHidePacked(prev => ({ ...prev, [categoryKey]: data.toggleHidePackedItems || false }));
+
+        ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
+          data.items[group]?.forEach((item: any, index: number) => {
+            items.push({
+              id: `${categoryKey}-${group.toLowerCase()}-${index}`,
+              name: item.name,
+              category: categoryKey,
+              source: item.tag,
+              note: item.tooltip,
+              isChecked: false,
+              tooltip: item.tooltip,
+              storeSuggestions: item.storeSuggestions,
+              studentTip: item.studentTip
+            });
+          });
         });
-      });
-    });
-  }
+      }
+    };
 
-  // Food
-  if (foodData?.items) {
-    ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
-      foodData.items[group]?.forEach((item, index) => {
-        items.push({
-          id: `food-${group.toLowerCase()}-${index}`,
-          name: item.name,
-          category: 'food',
-          source: item.tag as PackingItem['source'],
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
-        });
-      });
-    });
-  }
+    processCategory(clothingData, 'clothing');
+    processCategory(foodData, 'food');
+    processCategory(kitchenData, 'kitchen');
 
-  // Kitchen
-  if (kitchenData?.items) {
-    ['mustBring', 'optional', 'buyInFrance'].forEach((group) => {
-      kitchenData.items[group]?.forEach((item, index) => {
-        items.push({
-          id: `kitchen-${group.toLowerCase()}-${index}`,
-          name: item.name,
-          category: 'kitchen',
-          source: item.tag as PackingItem['source'],
-          note: item.tooltip,
-          isChecked: false,
-          tooltip: item.tooltip,
-          storeSuggestions: item.storeSuggestions,
-          studentTip: item.studentTip
-        });
-      });
-    });
-  }
+    // Hardcoded Electronics
+    items.push(
+      { id: 'electronics-0', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
+      { id: 'electronics-1', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets', isChecked: false },
+      { id: 'electronics-2', name: 'Smartphone', category: 'electronics', source: 'Pack from India', note: 'Ensure it\'s unlocked for French SIM', isChecked: false },
+      { id: 'electronics-3', name: 'Headphones', category: 'electronics', source: 'Pack from India', note: 'Useful for online classes', isChecked: false },
+      { id: 'electronics-4', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' }
+    );
 
-  // Other categories still hardcoded
-  items.push(
-    // Electronics
-    { id: '19', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
-    { id: '20', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets (different from India)', isChecked: false },
-    { id: '21', name: 'Smartphone', category: 'electronics', source: 'Pack from India', note: 'Ensure it\'s unlocked for French SIM', isChecked: false },
-    { id: '22', name: 'Headphones', category: 'electronics', source: 'Pack from India', note: 'Useful for online classes and calls', isChecked: false },
-    { id: '23', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' },
-
-    // Accommodation
-    { id: '24', name: 'Bedsheets & Pillowcases', category: 'accommodation', source: 'Buy in France', note: 'French beds may have different sizes', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€20-40' },
-    { id: '25', name: 'Towels', category: 'accommodation', source: 'Buy in France', note: 'Save luggage space', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€10-30' },
-    { id: '26', name: 'Small Desk Lamp', category: 'accommodation', source: 'Buy in France', note: 'For study area', isChecked: false, storeInfo: 'IKEA, Action', priceRange: '€10-20' },
-
-    // Toiletries
-    { id: '27', name: 'Medications', category: 'toiletries', source: 'Pack from India', note: 'Bring prescription meds & basics for first month', isChecked: false },
-    { id: '28', name: 'Toiletries', category: 'toiletries', source: 'Buy in France', note: 'Shampoo, soap, etc. - save luggage weight', isChecked: false, storeInfo: 'Carrefour, Monoprix', priceRange: '€10-30' },
-    { id: '29', name: 'Eyeglasses/Contacts', category: 'toiletries', source: 'Pack from India', note: 'Bring extra pair & prescription', isChecked: false },
-    { id: '30', name: 'Skincare Products', category: 'toiletries', source: 'Optional', note: 'Bring favorites, but French pharmacies are excellent', isChecked: false }
-  );
-
-  return items;
-};
-
+    return items;
+  };
 
   const initialPackingItems = generateInitialItems();
 
-  // Load items from localStorage on mount
   useEffect(() => {
     const savedItems = localStorage.getItem('packingItems');
     if (savedItems) {
@@ -145,26 +103,25 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
     }
   }, []);
 
-  // Save to localStorage whenever items change
   useEffect(() => {
     if (packingItems.length > 0) {
       localStorage.setItem('packingItems', JSON.stringify(packingItems));
     }
   }, [packingItems]);
 
-  // Calculate progress
+  useEffect(() => {
+    if (selectedCategory && autoToggleHidePacked[selectedCategory] !== undefined) {
+      setHidePacked(autoToggleHidePacked[selectedCategory]);
+    }
+  }, [selectedCategory, autoToggleHidePacked]);
+
   const totalItems = packingItems.length;
   const checkedItems = packingItems.filter(item => item.isChecked).length;
   const progressPercentage = totalItems > 0 ? Math.round((checkedItems / totalItems) * 100) : 0;
 
-  // Celebrate with confetti when progress reaches 100%
   useEffect(() => {
     if (progressPercentage >= 100 && !justCompleted) {
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       setJustCompleted(true);
     }
   }, [progressPercentage, justCompleted]);
