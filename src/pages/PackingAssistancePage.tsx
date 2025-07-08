@@ -19,9 +19,9 @@ import clothingDataRaw from '@/data/clothing.json';
 import confetti from 'canvas-confetti';
 
 const clothingData = clothingDataRaw.items ? [
-  ...(clothingDataRaw.items.mustBring || []),
-  ...(clothingDataRaw.items.optional || []),
-  ...(clothingDataRaw.items.buyInFrance || [])
+  ...(clothingDataRaw.items.mustBring || []).map(item => ({ ...item, tag: 'Pack from India' })),
+  ...(clothingDataRaw.items.optional || []).map(item => ({ ...item, tag: 'Optional' })),
+  ...(clothingDataRaw.items.buyInFrance || []).map(item => ({ ...item, tag: 'Buy in France' }))
 ] : [];
 
 interface PackingItem {
@@ -56,16 +56,9 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const { toast: uiToast } = useToast();
 
   const generateInitialItems = (): PackingItem[] => {
-    const items: PackingItem[] = [];
-
-    clothingData.forEach((item, index) => {
-      let source: PackingItem['source'] = item.tag === 'Pack from India'
-        ? 'Pack from India'
-        : item.tag === 'Buy in France'
-          ? 'Buy in France'
-          : 'Optional';
-
-      items.push({
+    return clothingData.map((item, index) => {
+      let source: PackingItem['source'] = item.tag as PackingItem['source'];
+      return {
         id: `clothing-${index}`,
         name: item.name,
         category: 'clothing',
@@ -75,20 +68,16 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
         storeInfo: item.storeSuggestions?.join(', ') || '',
         studentTip: item.studentTip || '',
         priceRange: ''
-      });
+      };
     });
-
-    return items;
   };
-
-  const initialPackingItems = generateInitialItems();
 
   useEffect(() => {
     const savedItems = localStorage.getItem('packingItems');
     if (savedItems) {
       setPackingItems(JSON.parse(savedItems));
     } else {
-      setPackingItems(initialPackingItems);
+      setPackingItems(generateInitialItems());
     }
   }, []);
 
@@ -119,7 +108,7 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
 
   return (
     <div>
-      {/* Add your full JSX rendering logic here using `filteredItems` */}
+      {/* Add your JSX UI rendering with filteredItems */}
     </div>
   );
 };
