@@ -14,6 +14,8 @@ import { toast } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
 import clothingData from '@/data/clothing.json';
 import foodData from '@/data/food.json';
+import kitchenData from '@/data/kitchen.json';
+import electronicsData from '@/data/electronics.json';
 import confetti from 'canvas-confetti';
 
 
@@ -154,21 +156,84 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
         });
       }
     }
-  
+    // Process kitchen items from JSON
+    if (kitchenData && kitchenData.items) {
+      if (kitchenData.items.mustBring) {
+        kitchenData.items.mustBring.forEach((item, index) => {
+          items.push({
+            id: `kitchen-mustbring-${index}`,
+            name: item.name,
+            category: 'kitchen',
+            source: item.tag,
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
+        });
+      }
+
+      if (kitchenData.items.optional) {
+        kitchenData.items.optional.forEach((item, index) => {
+          items.push({
+            id: `kitchen-optional-${index}`,
+            name: item.name,
+            category: 'kitchen',
+            source: item.tag,
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
+        });
+      }
+
+      if (kitchenData.items.buyInFrance) {
+        kitchenData.items.buyInFrance.forEach((item, index) => {
+          items.push({
+            id: `kitchen-buyinfrance-${index}`,
+            name: item.name,
+            category: 'kitchen',
+            source: item.tag,
+            note: item.tooltip,
+            isChecked: false,
+            tooltip: item.tooltip,
+            storeSuggestions: item.storeSuggestions,
+            studentTip: item.studentTip
+          });
+        });
+      }
+    }
+
+    // Process electronics items from JSON
+    if (electronicsData && Array.isArray(electronicsData)) {
+      electronicsData.forEach((item, index) => {
+        const storeSuggestions = item.storeSuggestions?.map(s => `${s.store} (${s.approxPrice})`);
+        const source = item.recommendation === 'must-bring'
+          ? 'Pack from India'
+          : item.recommendation === 'optional'
+          ? 'Optional'
+          : 'Buy in France';
+
+        packingItems.push({
+          id: `electronics-${index}`,
+          name: item.item,
+          category: 'electronics',
+          source,
+          note: '',
+          isChecked: false,
+          tooltip: item.studentTips,
+          storeSuggestions,
+          studentTip: item.studentTips
+        });
+      });
+    }
+
     // Add hardcoded items for other categories
     items.push(
-      // Kitchen Essentials
-      { id: '15', name: 'Pressure Cooker (small)', category: 'kitchen', source: 'Pack from India', note: 'Essential for Indian cooking, hard to find in France', isChecked: false },
-      { id: '16', name: 'Small Tadka Pan', category: 'kitchen', source: 'Pack from India', note: 'For tempering spices', isChecked: false },
-      { id: '17', name: 'Basic Utensils', category: 'kitchen', source: 'Buy in France', note: 'Plates, cups, cutlery', isChecked: false, storeInfo: 'Carrefour, Action', priceRange: '€15-30 total' },
-      { id: '18', name: 'Rice Cooker', category: 'kitchen', source: 'Optional', note: 'Useful but takes luggage space', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€20-40' },
     
-      // Electronics
-      { id: '19', name: 'Laptop & Charger', category: 'electronics', source: 'Pack from India', note: 'Essential for studies', isChecked: false },
-      { id: '20', name: 'Universal Adapter', category: 'electronics', source: 'Pack from India', note: 'France uses Type E sockets (different from India)', isChecked: false },
-      { id: '21', name: 'Smartphone', category: 'electronics', source: 'Pack from India', note: 'Ensure it\'s unlocked for French SIM', isChecked: false },
-      { id: '22', name: 'Headphones', category: 'electronics', source: 'Pack from India', note: 'Useful for online classes and calls', isChecked: false },
-      { id: '23', name: 'Extension Board', category: 'electronics', source: 'Buy in France', note: 'Get one with French plugs', isChecked: false, storeInfo: 'Carrefour, Darty', priceRange: '€10-20' },
     
       // Accommodation Setup
       { id: '24', name: 'Bedsheets & Pillowcases', category: 'accommodation', source: 'Buy in France', note: 'French beds may have different sizes', isChecked: false, storeInfo: 'IKEA, Carrefour', priceRange: '€20-40' },
