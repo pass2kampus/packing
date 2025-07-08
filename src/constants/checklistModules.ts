@@ -33,6 +33,14 @@ const checklistModules = [
     type: 'module'
   },
   {
+    id: 'packing-assistance',
+    title: 'Packing Assistance',
+    description: 'Plan your luggage smartly for your journey to France.',
+    icon: '🎒',
+    color: 'bg-teal-500',
+    type: 'navigation'
+  },
+  {
     id: 'integration',
     title: 'French Integration',
     description: 'Learn French culture, language basics, and integration tips.',
