@@ -50,251 +50,236 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   });
   const { toast: uiToast } = useToast();
 
-  // Initial packing items data
   const generateInitialItems = (): PackingItem[] => {
-    const items: PackingItem[] = [];
+  const items: PackingItem[] = [];
 
-    // Process clothing items from JSON
-    if (clothingData && clothingData.items) {
-      // Process mustBring items
-      if (clothingData.items.mustBring) {
-        clothingData.items.mustBring.forEach((item, index) => {
-          items.push({
-            id: `clothing-mustbring-${index}`,
-            name: item.name,
-            category: 'clothing',
-            source: 'Pack from India',
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
+  // CLOTHING
+  if (clothingData?.items) {
+    if (clothingData.items.mustBring) {
+      clothingData.items.mustBring.forEach((item, index) => {
+        items.push({
+          id: `clothing-mustbring-${index}`,
+          name: item.name,
+          category: 'clothing',
+          source: 'Pack from India',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
         });
-      }
-
-      // Process optional items
-      if (clothingData.items.optional) {
-        clothingData.items.optional.forEach((item, index) => {
-          items.push({
-            id: `clothing-optional-${index}`,
-            name: item.name,
-            category: 'clothing',
-            source: 'Optional',
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
-        });
-      }
-
-      // Process buyInFrance items
-      if (clothingData.items.buyInFrance) {
-        clothingData.items.buyInFrance.forEach((item, index) => {
-          items.push({
-            id: `clothing-buyinfrance-${index}`,
-            name: item.name,
-            category: 'clothing',
-            source: 'Buy in France',
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
-        });
-      }
+      });
     }
-
-    // Process food items from JSON
-    if (foodData && foodData.items) {
-      if (foodData.items.mustBring) {
-        foodData.items.mustBring.forEach((item, index) => {
-          items.push({
-            id: `food-mustbring-${index}`,
-            name: item.name,
-            category: 'food',
-            source: 'Pack from India',
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
+    if (clothingData.items.optional) {
+      clothingData.items.optional.forEach((item, index) => {
+        items.push({
+          id: `clothing-optional-${index}`,
+          name: item.name,
+          category: 'clothing',
+          source: 'Optional',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
         });
-      }
-
-      if (foodData.items.optional) {
-        foodData.items.optional.forEach((item, index) => {
-          items.push({
-            id: `food-optional-${index}`,
-            name: item.name,
-            category: 'food',
-            source: 'Optional',
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
-        });
-      }
-
-      if (foodData.items.buyInFrance) {
-        foodData.items.buyInFrance.forEach((item, index) => {
-          items.push({
-            id: `food-buyinfrance-${index}`,
-            name: item.name,
-            category: 'food',
-            source: 'Buy in France',
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
-        });
-      }
+      });
     }
-    // Process kitchen items from JSON
-    if (kitchenData && kitchenData.items) {
-      if (kitchenData.items.mustBring) {
-        kitchenData.items.mustBring.forEach((item, index) => {
-          items.push({
-            id: `kitchen-mustbring-${index}`,
-            name: item.name,
-            category: 'kitchen',
-            source: item.tag,
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
+    if (clothingData.items.buyInFrance) {
+      clothingData.items.buyInFrance.forEach((item, index) => {
+        items.push({
+          id: `clothing-buyinfrance-${index}`,
+          name: item.name,
+          category: 'clothing',
+          source: 'Buy in France',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
         });
-      }
-
-      if (kitchenData.items.optional) {
-        kitchenData.items.optional.forEach((item, index) => {
-          items.push({
-            id: `kitchen-optional-${index}`,
-            name: item.name,
-            category: 'kitchen',
-            source: item.tag,
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
-        });
-      }
-
-      if (kitchenData.items.buyInFrance) {
-        kitchenData.items.buyInFrance.forEach((item, index) => {
-          items.push({
-            id: `kitchen-buyinfrance-${index}`,
-            name: item.name,
-            category: 'kitchen',
-            source: item.tag,
-            note: item.tooltip,
-            isChecked: false,
-            tooltip: item.tooltip,
-            storeSuggestions: item.storeSuggestions,
-            studentTip: item.studentTip
-          });
-        });
-      }
+      });
     }
+  }
 
-    // Process electronics items from JSON
-    if (electronicsData && Array.isArray(electronicsData)) {
-      electronicsData.forEach((item, index) => {
-        const storeSuggestions = item.storeSuggestions?.map(s => `${s.store} (${s.approxPrice})`);
-        const source = item.recommendation === 'must-bring'
+  // FOOD
+  if (foodData?.items) {
+    if (foodData.items.mustBring) {
+      foodData.items.mustBring.forEach((item, index) => {
+        items.push({
+          id: `food-mustbring-${index}`,
+          name: item.name,
+          category: 'food',
+          source: 'Pack from India',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+    if (foodData.items.optional) {
+      foodData.items.optional.forEach((item, index) => {
+        items.push({
+          id: `food-optional-${index}`,
+          name: item.name,
+          category: 'food',
+          source: 'Optional',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+    if (foodData.items.buyInFrance) {
+      foodData.items.buyInFrance.forEach((item, index) => {
+        items.push({
+          id: `food-buyinfrance-${index}`,
+          name: item.name,
+          category: 'food',
+          source: 'Buy in France',
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+  }
+
+  // KITCHEN
+  if (kitchenData?.items) {
+    if (kitchenData.items.mustBring) {
+      kitchenData.items.mustBring.forEach((item, index) => {
+        items.push({
+          id: `kitchen-mustbring-${index}`,
+          name: item.name,
+          category: 'kitchen',
+          source: item.tag,
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+    if (kitchenData.items.optional) {
+      kitchenData.items.optional.forEach((item, index) => {
+        items.push({
+          id: `kitchen-optional-${index}`,
+          name: item.name,
+          category: 'kitchen',
+          source: item.tag,
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+    if (kitchenData.items.buyInFrance) {
+      kitchenData.items.buyInFrance.forEach((item, index) => {
+        items.push({
+          id: `kitchen-buyinfrance-${index}`,
+          name: item.name,
+          category: 'kitchen',
+          source: item.tag,
+          note: item.tooltip,
+          isChecked: false,
+          tooltip: item.tooltip,
+          storeSuggestions: item.storeSuggestions,
+          studentTip: item.studentTip
+        });
+      });
+    }
+  }
+
+  // ELECTRONICS
+  if (Array.isArray(electronicsData)) {
+    electronicsData.forEach((item, index) => {
+      const storeSuggestions = item.storeSuggestions?.map(s => `${s.store} (${s.approxPrice})`);
+      const source: PackingItem['source'] =
+        item.recommendation === 'must-bring'
           ? 'Pack from India'
           : item.recommendation === 'optional'
           ? 'Optional'
           : 'Buy in France';
 
-        items.push({
-          id: `electronics-${index}`,
-          name: item.item,
-          category: 'electronics',
-          source,
-          note: '',
-          isChecked: false,
-          tooltip: item.studentTips,
-          storeSuggestions,
-          studentTip: item.studentTips
-        });
+      items.push({
+        id: `electronics-${index}`,
+        name: item.item,
+        category: 'electronics',
+        source,
+        note: '',
+        isChecked: false,
+        tooltip: item.studentTips,
+        storeSuggestions,
+        studentTip: item.studentTips
       });
-    }
+    });
+  }
 
-
-    // Process accommodation items from JSON
-    if (accommodationData && Array.isArray(accommodationData)) {
-      accommodationData.forEach((item, index) => {
-        const storeSuggestions = item.storeSuggestions?.map(s => `${s.store} (${s.approxPrice})`);
-        const source = item.recommendation === 'must-bring'
+  // ACCOMMODATION
+  if (Array.isArray(accommodationData)) {
+    accommodationData.forEach((item, index) => {
+      const storeSuggestions = item.storeSuggestions?.map(s => `${s.store} (${s.approxPrice})`);
+      const source: PackingItem['source'] =
+        item.recommendation === 'must-bring'
           ? 'Pack from India'
           : item.recommendation === 'buy-there'
           ? 'Buy in France'
           : 'Optional';
 
-        items.push({
-          id: `accommodation-${index}`,
-          name: item.item,
-          category: 'accommodation',
-          source,
-          note: '',
-          isChecked: false,
-          tooltip: item.studentTips,
-          storeSuggestions,
-          studentTip: item.studentTips
-        });
+      items.push({
+        id: `accommodation-${index}`,
+        name: item.item,
+        category: 'accommodation',
+        source,
+        note: '',
+        isChecked: false,
+        tooltip: item.studentTips,
+        storeSuggestions,
+        studentTip: item.studentTips
       });
-    }
+    });
+  }
 
-    // Process toiletries items from JSON
-    if (toiletriesData) {
-      toiletriesData.forEach((item, index) => {
-        let source: PackingItem['source'];
-        switch (item.recommendation) {
-          case 'must-bring':
-            source = 'Pack from India';
-            break;
-          case 'buy-there':
-            source = 'Buy in France';
-            break;
-          case 'optional':
-          default:
-            source = 'Optional';
-            break;
-        }
+  // TOILETRIES
+  if (Array.isArray(toiletriesData)) {
+    toiletriesData.forEach((item, index) => {
+      const storeSuggestions = item.storeSuggestions?.map(s =>
+        `${s.store}${s.approxPrice ? ` (${s.approxPrice})` : ''}`
+      );
+      const source: PackingItem['source'] =
+        item.recommendation === 'must-bring'
+          ? 'Pack from India'
+          : item.recommendation === 'buy-there'
+          ? 'Buy in France'
+          : 'Optional';
 
-        const storeSuggestions = item.storeSuggestions?.map(
-          s => `${s.store}${s.approxPrice ? ` (${s.approxPrice})` : ''}`
-        );
-
-        items.push({
-          id: `toiletries-${index}`,
-          name: item.item,
-          category: 'toiletries',
-          source,
-          note: item.studentTips,
-          isChecked: false,
-          tooltip: item.studentTips,
-          storeSuggestions
-        });
+      items.push({
+        id: `toiletries-${index}`,
+        name: item.item,
+        category: 'toiletries',
+        source,
+        note: item.studentTips,
+        isChecked: false,
+        tooltip: item.studentTips,
+        storeSuggestions,
+        studentTip: item.studentTips
       });
-    }
+    });
+  }
 
-    
-    return items;
-  };
+  return items;
+};
+
 
   const initialPackingItems = generateInitialItems();
 
