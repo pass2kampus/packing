@@ -38,9 +38,11 @@ export const PackingAssistancePage = ({ onBack }: PackingAssistancePageProps) =>
   const [justCompleted, setJustCompleted] = useState(false);
   const [hidePacked, setHidePacked] = useState(false);
   const [newItem, setNewItem] = useState<Omit<PackingItem, 'id' | 'isChecked' | 'category'>>({
-    name: '',
-    source: 'Pack from India',
-  });
+  name: '',
+  source: 'Pack from India',
+  note: ''
+});
+
   const { toast: uiToast } = useToast();
 
   const generateInitialItems = (): PackingItem[] => {
